@@ -1,5 +1,3 @@
-import os
-
 import aiomysql
 from pymysql import connect
 import asyncio
