@@ -117,7 +117,6 @@ async def phone_driver_and_pass(message: Message, state: FSMContext):
         )
 
     await message.answer("Готово")
-
     await state.reset_state(with_data=True)
 
 
