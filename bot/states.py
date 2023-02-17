@@ -11,4 +11,6 @@ class PassengerFSM(StatesGroup):
     phone = State()
 
 
-
+class UserLocationFSM(StatesGroup):
+    current_location = State()
+    order_location = State()

@@ -8,6 +8,8 @@ import arrow
 import bot.Database.methods.create as db_create
 import bot.Database.methods.get as db_select
 import bot.keyboards.inline as inline
+import bot.keyboards.reply as reply
+
 from bot.env import *
 from bot.states import *
 
@@ -16,16 +18,16 @@ lock = Lock()
 
 async def star_login(message: Message):
 
-    if await db_select.exists_user(message.from_user.id):
-        await message.answer("Добро пожаловать")
+    #if await db_select.exists_user(message.from_user.id):
+    await message.answer("Добро пожаловать", reply_markup=reply.profile_markup())
 
-    else:
-        await message.answer(
-            '<b>Taxi bot<b> это крупный бла бла бал,выберите вы пассажир или пользователь',
-            reply_markup=inline.check_status_btns()
-        )
-
-    await DriverFSM.phone.set()
+    # else:
+    #     await message.answer(
+    #         '<b>Taxi bot<b> это крупный бла бла бал,выберите вы пассажир или пользователь',
+    #         reply_markup=inline.check_status_btns()
+    #     )
+    #
+    # await DriverFSM.phone.set()
 
 
 async def driver(callback: CallbackQuery):
