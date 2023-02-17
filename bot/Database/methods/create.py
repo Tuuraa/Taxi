@@ -6,7 +6,7 @@ async def create_new_user(user_id, full_name, number, link, date_reg):
 
     async with conncection.cursor() as cursor:
         await cursor.execute(
-            'insert into users (user_id, full_name, number, link, date_reg,) values (%s,%s, %s, %s, %s,)',
+            'insert into users (user_id, full_name, number, link, date_reg) values (%s,%s, %s, %s, %s)',
             (user_id, full_name, number, link, date_reg)
         )
 
