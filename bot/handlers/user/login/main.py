@@ -29,12 +29,32 @@ async def star_login(message: Message):
 
 
 async def driver(callback: CallbackQuery):
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+    await bot.send_message(
+        callback.from_user.id,
+        'Введите марку вашего автомобиля',
+    )
+#проверка на
     await DriverFSM.car_mark.set()
 
 
 async def car_mark(message: Message, state: FSMContext):
-    pass
+    await bot.send_message(
+        message.from_user.id,
+        'Введите гос номер вашего автомобиля',
+    )
+    await DriverFSM.car_numbers.set()
 
+
+async def driver_name(message:Message, state:FSMContext):
+    await bot.send_message(
+        message.from_user.id,
+        'Введите ваше полное имя',
+    )
+    await DriverFSM.full_name.set()
 
 async def passenger(callback: CallbackQuery):
     pass
