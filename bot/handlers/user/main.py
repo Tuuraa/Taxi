@@ -4,7 +4,11 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
 
 
-from .LogIn import register_login_handlers
-from .Refill import registration_refill_handlers
+from .login import register_login_handlers
+from .refill import register_refill_handlers
 
 from bot.env import *
+
+
+def register_user_handlers(dp: Dispatcher):
+    register_login_handlers(dp)

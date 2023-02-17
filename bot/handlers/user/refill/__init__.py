@@ -1,1 +1,1 @@
-from .main import registration_refill_handlers
+from .main import register_refill_handlers

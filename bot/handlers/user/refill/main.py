@@ -14,3 +14,7 @@ import bot.keyboards.reply as reply
 
 
 lock = Lock()
+
+
+def register_refill_handlers(dp:Dispatcher):
+    pass
