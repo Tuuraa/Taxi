@@ -19,3 +19,10 @@ class UserLocationFSM(StatesGroup):
     order_location = State()
     agreed_location = State()
     disagree_location = State()
+
+
+class CreateRequestWithdrowFSM(StatesGroup):
+    type_bank = State()
+    card = State()
+    wallet = State()
+    amount = State()

@@ -47,7 +47,8 @@ async def profile(message: Message, state: FSMContext):
         await message.answer(
             f'🤖 Ваш ID: <b>{user_data[1][0]}</b>\n'
             f'👤 ФИО: <b>{user_data[1][1]}\n</b>'
-            f'📱 Телефон: <b>{user_data[1][2]}</b>\n',
+            f'📱 Телефон: <b>{user_data[1][2]}</b>\n'
+            f'Баланс: <b>{user_data[1][3]}<b>\n',
             parse_mode='html',
             reply_markup=inline.profile_passenger_btn()
         )
@@ -57,7 +58,8 @@ async def profile(message: Message, state: FSMContext):
             f'👤 ФИО: <b>{user_data[1][1]}</b>\n'
             f'📱 Телефон: <b>{user_data[1][2]}</b>\n\n'
             f'🚗 Марка машины: <b>{user_data[1][3]}</b>\n'
-            f'🚕 Номер машины: <b>{user_data[1][4]}</b>',
+            f'🚕 Номер машины: <b>{user_data[1][4]}</b>\n'
+            f'Баланс: <b>{user_data[1][5]}<b>\n',
             parse_mode='html',
             reply_markup=inline.profile_driver_btn()
         )

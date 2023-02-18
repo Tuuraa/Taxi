@@ -24,6 +24,8 @@ def order_taxi():
     return inline
 
 
+
+
 def profile_passenger_btn():
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton('💸 Пополнить', callback_data='top_up')
@@ -34,6 +36,15 @@ def profile_driver_btn():
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton('💰 Вывести', callback_data='withdraw')
     )
+
+
+def type_bank_btn():
+    inline = InlineKeyboardMarkup().add(
+        InlineKeyboardButton("Сбербанк", callback_data="sber_type_amount"),
+        InlineKeyboardButton("Тинькофф", callback_data="tink_type_amount")
+    )
+
+    return inline
 
 
 def responde_order():
