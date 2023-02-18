@@ -16,19 +16,6 @@ from bot.states import *
 lock = Lock()
 
 
-async def star_login(message: Message):
-
-    if await db_select.exists_passenger(message.from_user.id) or await db_select.exists_driver( message.from_user.id):
-        await message.answer("Добро пожаловать", reply_markup=reply.profile_markup())
-
-    else:
-        await message.answer(
-            '<b>Taxi bot</b> это крупный бла бла бал,выберите вы пассажир или пользователь',
-            reply_markup=inline.check_status_btns(),
-            parse_mode='html'
-        )
-
-
 async def driver(callback: CallbackQuery):
     await bot.delete_message(
         callback.from_user.id,
@@ -159,7 +146,6 @@ async def phone_pass(message: Message, state: FSMContext):
 
 
 def register_login_handlers(dp: Dispatcher):
-    dp.register_message_handler(star_login, commands=['start'], state='*')
     dp.register_callback_query_handler(driver, text="driver")
     dp.register_callback_query_handler(passenger, text="passenger")
     dp.register_message_handler(car_mark, state=DriverFSM.car_mark)

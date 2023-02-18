@@ -4,7 +4,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 def profile_markup():
     return ReplyKeyboardMarkup(resize_keyboard=True).add(
         KeyboardButton('👤 Профиль'),
-        KeyboardButton('Заказать такси')
+        KeyboardButton('🚕 Заказать такси')
     ).add(
         KeyboardButton('Техническая поддержка')
     )

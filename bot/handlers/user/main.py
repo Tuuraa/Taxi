@@ -17,6 +17,19 @@ from bot.env import *
 from ...states import UserLocationFSM
 
 
+async def star_login(message: Message):
+
+    if await db_select.exists_passenger(message.from_user.id) or await db_select.exists_driver(message.from_user.id):
+        await message.answer("Добро пожаловать", reply_markup=reply.profile_markup())
+
+    else:
+        await message.answer(
+            '<b>Taxi bot</b> это крупный бла бла бал,выберите вы пассажир или пользователь',
+            reply_markup=inline.check_status_btns(),
+            parse_mode='html'
+        )
+
+
 async def profile(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
     user_data = (await db_select.profile_data(message.from_user.id))
@@ -112,12 +125,13 @@ async def support(message: Message):
 
 
 def register_user_handlers(dp: Dispatcher):
+    dp.register_message_handler(star_login, commands=['start'], state='*')
     dp.register_message_handler(profile, lambda msg: msg.text == '👤 Профиль', state="*")
     dp.register_message_handler(back, lambda mes: mes.text == '⬅️ Вернуться', state='*')
     dp.register_message_handler(current_user_location_handler, state=UserLocationFSM.current_location,
                                 content_types=['location', 'text'])
     dp.register_message_handler(order_location, state=UserLocationFSM.order_location,
                                 content_types=['location', 'text'])
-    dp.register_message_handler(order_taxi, lambda mes: mes.text == 'Заказать такси')
+    dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси')
     dp.register_message_handler(support, lambda mes: mes.text == 'Техническая поддержка')
     register_login_handlers(dp)
