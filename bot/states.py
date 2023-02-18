@@ -16,3 +16,5 @@ class PassengerFSM(StatesGroup):
 class UserLocationFSM(StatesGroup):
     current_location = State()
     order_location = State()
+    agreed_location = State()
+    disagree_location = State()

@@ -1,4 +1,5 @@
 from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
 from json import loads
 
 
@@ -9,4 +10,10 @@ def current_user_location(location):
 
     nomin = Nominatim(user_agent='user')
 
-    return nomin.reverse(f'{latitude} {longitude}')
+    return nomin.reverse(f'{latitude} {longitude}'), latitude, longitude
+
+
+def distance_btw_two_points(current_point, order_point):
+    distance = geodesic(current_point, order_point)
+
+    return distance

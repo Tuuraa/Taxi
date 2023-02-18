@@ -116,7 +116,7 @@ async def phone_driver_and_pass(message: Message, state: FSMContext):
             datetime.today()
         )
 
-    await message.answer("Готово")
+    await message.answer("Регистрация прошла успешно!\nДобро пожаловать")
     await state.reset_state(with_data=True)
 
 

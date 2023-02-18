@@ -10,3 +10,12 @@ def check_status_btns():
         InlineKeyboardButton('👤 Пассажир', callback_data='passenger'),
     )
     return inline
+
+
+def order_taxi():
+    inline = InlineKeyboardMarkup().add(
+        InlineKeyboardButton('Заказать', callback_data='order_taxi'),
+        InlineKeyboardButton('Отменить', callback_data='cancel_order'),
+    )
+
+    return inline

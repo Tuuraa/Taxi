@@ -10,8 +10,14 @@ def profile_markup():
     )
 
 
-def set_locale():
+def set_current_locale():
     return ReplyKeyboardMarkup(resize_keyboard=True).add(
         KeyboardButton('📍 Отправить свою локацию', request_location=True),
+        KeyboardButton('⬅️ Вернуться')
+    )
+
+
+def order_location():
+    return ReplyKeyboardMarkup(resize_keyboard=True).add(
         KeyboardButton('⬅️ Вернуться')
     )
