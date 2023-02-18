@@ -18,7 +18,7 @@ async def crate_new_driver(user_id, full_name, car, car_number, number, link, da
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            'insert into drivers (user_id,full_name, car, car_number, number, link, date_reg,) values (%s, %s, %s, %s, %s, %s, %s,)',
+            'insert into drivers (user_id, full_name, car, car_number, number, link, date_reg) values (%s, %s, %s, %s, %s, %s, %s)',
             (user_id, full_name, car, car_number, number, link, date_reg)
         )
         await connection.commit()

@@ -66,7 +66,7 @@ async def driver_number(message: Message, state: FSMContext):
     await DriverFSM.full_name.set()
 
 
-async def full_name_driver(message: Message, state:FSMContext):
+async def full_name_driver(message: Message, state: FSMContext):
     if len(message.text.split(' ')) != 3:
         await message.answer('Неверно введен ФИО!')
         return
@@ -93,12 +93,12 @@ async def phone_driver(message: Message, state: FSMContext):
     async with state.proxy() as proxy:
         await db_create.crate_new_driver(
             message.from_user.id,
-            str(proxy['car_mark']),
+            str(proxy['full_name']).title(),
+            str(proxy['car_mark']).title(),
             str(proxy['car_numbers']),
-            str(proxy['full_name']),
             message.text,
             message.from_user.username,
-            datetime.today()
+            datetime.now().date()
         )
 
     await message.answer("Регистрация прошла успешно!\nДобро пожаловать")
@@ -151,7 +151,7 @@ async def phone_pass(message: Message, state: FSMContext):
             str(proxy['full_name']).title(),
             message.text,
             message.from_user.username,
-            datetime.today()
+            datetime.now().date()
         )
 
     await message.answer("Регистрация прошла успешно!\nДобро пожаловать")
@@ -164,6 +164,7 @@ def register_login_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(passenger, text="passenger")
     dp.register_message_handler(car_mark, state=DriverFSM.car_mark)
     dp.register_message_handler(driver_number, state=DriverFSM.car_numbers)
+    dp.register_message_handler(full_name_driver, state=DriverFSM.full_name)
     dp.register_message_handler(full_name_passenger, state=PassengerFSM.full_name)
     dp.register_message_handler(phone_driver, state=DriverFSM.phone)
     dp.register_message_handler(phone_pass, state=PassengerFSM.phone)
