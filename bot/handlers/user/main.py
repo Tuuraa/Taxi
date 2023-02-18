@@ -17,6 +17,14 @@ from bot.env import *
 from ...states import UserLocationFSM
 
 
+async def profile(message: Message, state: FSMContext):
+    await state.reset_state(with_data=True)
+    user_data = (await db_select.profile_data(message.from_user.id))
+    message.answer(
+
+    )
+
+
 async def current_user_location_handler(message: Message, state: FSMContext):
     location = current_user_location(message)
 
@@ -81,6 +89,7 @@ async def back(message: Message, state: FSMContext):
 
 
 def register_user_handlers(dp: Dispatcher):
+    dp.register_message_handler(profile, lambda msg: msg.text == 'профиль', state="*")
     dp.register_message_handler(back, lambda mes: mes.text == '⬅️ Вернуться', state='*')
     dp.register_message_handler(current_user_location_handler, state=UserLocationFSM.current_location,
                                 content_types=['location', 'text'])
