@@ -45,3 +45,28 @@ async def profile_data(user_id):
 
             result = await cursor.fetchone()
             return 'drive', result
+
+
+async def type_user(user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'select user_id, full_name, number from users where user_id = %s',
+            user_id
+        )
+        result = await cursor.fetchone()
+
+        if result:
+            return 'passenger'
+        else:
+            return 'driver'
+
+
+async def all_active_orders(user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'select '
+        )

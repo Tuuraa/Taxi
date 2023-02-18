@@ -1,10 +1,21 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
+from bot.env import republics
 
-def profile_markup():
+
+def profile_passenger_markup():
     return ReplyKeyboardMarkup(resize_keyboard=True).add(
         KeyboardButton('👤 Профиль'),
         KeyboardButton('🚕 Заказать такси')
+    ).add(
+        KeyboardButton('Техническая поддержка')
+    )
+
+
+def profile_driver_markup():
+    return ReplyKeyboardMarkup(resize_keyboard=True).add(
+        KeyboardButton('👤 Профиль'),
+        KeyboardButton('🚕 Активные заказы')
     ).add(
         KeyboardButton('Техническая поддержка')
     )
@@ -21,3 +32,12 @@ def order_location():
     return ReplyKeyboardMarkup(resize_keyboard=True).add(
         KeyboardButton('⬅️ Вернуться')
     )
+
+
+def all_republics():
+    reply = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    for republic in republics:
+        reply.add(republic)
+
+    return reply

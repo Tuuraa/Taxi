@@ -5,6 +5,7 @@ class DriverFSM(StatesGroup):
     car_mark = State()
     car_numbers = State()
     full_name = State()
+    republic = State()
     phone = State()
 
 

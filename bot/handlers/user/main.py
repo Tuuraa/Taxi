@@ -20,7 +20,12 @@ from ...states import UserLocationFSM
 async def star_login(message: Message):
 
     if await db_select.exists_passenger(message.from_user.id) or await db_select.exists_driver(message.from_user.id):
-        await message.answer("Добро пожаловать", reply_markup=reply.profile_markup())
+
+        user_data = await db_select.type_user(message.from_user.id)
+        await message.answer(
+            "Добро пожаловать",
+            reply_markup=reply.profile_passenger_markup() if user_data == 'passenger' else reply.profile_driver_markup()
+        )
 
     else:
         await message.answer(
@@ -91,12 +96,17 @@ async def order_location(message: Message, state: FSMContext):
             order_point=second_loc
         )
 
+        republic = location[0].addres.split(',')
+        print(republic)
+
+        user_data = await db_select.type_user(message.from_user.id)
+
         await message.answer(
             f'Расстояние состовляет: {round(distance.m, 3)} м.',
-            reply_markup=reply.profile_markup()
+            reply_markup=reply.profile_passenger_markup() if user_data == 'passenger' else reply.profile_driver_markup()
         )
 
-    #await state.reset_state(with_data=True)
+    await state.reset_state(with_data=True)
 
 
 async def order_taxi(message: Message):
@@ -113,7 +123,7 @@ async def back(message: Message, state: FSMContext):
 
     await message.answer(
         'Вернулся',
-        reply_markup=reply.profile_markup()
+        reply_markup=reply.profile_passenger_markup()
     )
 
 
@@ -122,6 +132,10 @@ async def support(message: Message):
         'По любым вопросам пишите @bluabitch\n'
         'Ответит в течении часа!'
     )
+
+
+async def active_orders(message: Message):
+    pass
 
 
 def register_user_handlers(dp: Dispatcher):
@@ -133,5 +147,6 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(order_location, state=UserLocationFSM.order_location,
                                 content_types=['location', 'text'])
     dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси')
+    dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы')
     dp.register_message_handler(support, lambda mes: mes.text == 'Техническая поддержка')
     register_login_handlers(dp)

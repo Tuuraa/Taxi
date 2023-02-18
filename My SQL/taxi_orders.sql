@@ -16,32 +16,32 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `users`
+-- Table structure for table `orders`
 --
 
-DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `orders`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
+CREATE TABLE `orders` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NOT NULL,
-  `full_name` varchar(90) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `number` varchar(15) NOT NULL,
-  `link` varchar(45) NOT NULL,
-  `date_reg` date NOT NULL,
-  `balance` float DEFAULT NULL,
+  `user_location` text,
+  `order_location` text,
+  `distance` float DEFAULT NULL,
+  `amount` float DEFAULT NULL,
+  `user_id` bigint DEFAULT NULL,
+  `status` varchar(60) DEFAULT NULL,
+  `republic` varchar(60) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `users`
+-- Dumping data for table `orders`
 --
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (6,803270707,'Джандаров Роберт Анзорович','79380339965','Arrrrrrriva','2023-02-18',NULL),(8,855151774,'Карданов Артур Ауесович','89897898328','bluabitch','2023-02-19',NULL);
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+LOCK TABLES `orders` WRITE;
+/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
