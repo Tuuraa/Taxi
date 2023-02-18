@@ -104,6 +104,10 @@ async def back(message: Message, state: FSMContext):
     )
 
 
+async def support(message: Message):
+    pass
+
+
 def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(profile, lambda msg: msg.text == '👤 Профиль', state="*")
     dp.register_message_handler(back, lambda mes: mes.text == '⬅️ Вернуться', state='*')
@@ -112,4 +116,5 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(order_location, state=UserLocationFSM.order_location,
                                 content_types=['location', 'text'])
     dp.register_message_handler(order_taxi, lambda mes: mes.text == 'Заказать такси')
+    dp.register_message_handler(support, lambda mes: mes.text == 'Техническая поддержка')
     register_login_handlers(dp)
