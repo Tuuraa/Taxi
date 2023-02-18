@@ -20,9 +20,25 @@ from ...states import UserLocationFSM
 async def profile(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
     user_data = (await db_select.profile_data(message.from_user.id))
-    message.answer(
 
-    )
+    if user_data[0] == 'pass':
+        await message.answer(
+            f'🤖 Ваш ID: <b>{user_data[1][0]}</b>\n'
+            f'👤 ФИО: <b>{user_data[1][1]}\n</b>'
+            f'📱 Телефон: <b>{user_data[1][2]}</b>\n',
+            parse_mode='html',
+            reply_markup=inline.profile_passenger_btn()
+        )
+    else:
+        await message.answer(
+            f'🤖 Ваш ID: <b>{user_data[1][0]}</b>\n'
+            f'👤 ФИО: <b>{user_data[1][1]}</b>\n'
+            f'📱 Телефон: <b>{user_data[1][2]}</b>\n\n'
+            f'🚗 Марка машины: <b>{user_data[1][3]}</b>\n'
+            f'🚕 Номер машины: <b>{user_data[1][4]}</b>',
+            parse_mode='html',
+            reply_markup=inline.profile_driver_btn()
+        )
 
 
 async def current_user_location_handler(message: Message, state: FSMContext):
@@ -89,7 +105,7 @@ async def back(message: Message, state: FSMContext):
 
 
 def register_user_handlers(dp: Dispatcher):
-    dp.register_message_handler(profile, lambda msg: msg.text == 'профиль', state="*")
+    dp.register_message_handler(profile, lambda msg: msg.text == '👤 Профиль', state="*")
     dp.register_message_handler(back, lambda mes: mes.text == '⬅️ Вернуться', state='*')
     dp.register_message_handler(current_user_location_handler, state=UserLocationFSM.current_location,
                                 content_types=['location', 'text'])

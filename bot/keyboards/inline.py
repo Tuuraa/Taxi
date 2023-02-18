@@ -19,3 +19,15 @@ def order_taxi():
     )
 
     return inline
+
+
+def profile_passenger_btn():
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton('💸 Пополнить', callback_data='top_up')
+    )
+
+
+def profile_driver_btn():
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton('💰 Вывести', callback_data='withdraw')
+    )

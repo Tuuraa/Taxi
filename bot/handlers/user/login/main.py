@@ -95,7 +95,7 @@ async def phone_driver(message: Message, state: FSMContext):
             message.from_user.id,
             str(proxy['full_name']).title(),
             str(proxy['car_mark']).title(),
-            str(proxy['car_numbers']),
+            str(proxy['car_numbers']).upper(),
             message.text,
             message.from_user.username,
             datetime.now().date()
