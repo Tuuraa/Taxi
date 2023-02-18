@@ -105,7 +105,10 @@ async def back(message: Message, state: FSMContext):
 
 
 async def support(message: Message):
-    pass
+    await message.answer(
+        'По любым вопросам пишите @bluabitch\n'
+        'Ответит в течении часа!'
+    )
 
 
 def register_user_handlers(dp: Dispatcher):
