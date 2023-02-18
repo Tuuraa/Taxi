@@ -63,10 +63,27 @@ async def type_user(user_id):
             return 'driver'
 
 
-async def all_active_orders(user_id):
+async def republic_by_driver(user_id):
     connection, cursor = await async_connect_to_my_sql()
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            'select '
+            'select republic from drivers where user_id = %s',
+            user_id
         )
+
+        result = await cursor.fetchone()
+        return result[0]
+
+
+async def all_active_orders(republic):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from orders where status = 'WAITING' and republic = %s",
+            republic
+        )
+
+        result = await cursor.fetchall()
+        return result
