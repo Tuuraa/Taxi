@@ -66,6 +66,45 @@ async def driver_number(message: Message, state: FSMContext):
     await DriverFSM.full_name.set()
 
 
+async def full_name_driver(message: Message, state:FSMContext):
+    if len(message.text.split(' ')) != 3:
+        await message.answer('Неверно введен ФИО!')
+        return
+
+    async with state.proxy() as proxy:
+        proxy['full_name'] = message.text
+
+    await message.answer(
+        'Теперь напишите свой номер телефона'
+    )
+
+    await DriverFSM.phone.set()
+
+
+async def phone_driver(message: Message, state: FSMContext):
+    if not message.text.isdigit():
+        await message.answer("Неверный номер!")
+        return
+
+    if 0 < len(message.text) < 11:
+        await message.answer("Неверный номер!")
+        return
+
+    async with state.proxy() as proxy:
+        await db_create.crate_new_driver(
+            message.from_user.id,
+            str(proxy['car_mark']),
+            str(proxy['car_numbers']),
+            str(proxy['full_name']),
+            message.text,
+            message.from_user.username,
+            datetime.today()
+        )
+
+    await message.answer("Регистрация прошла успешно!\nДобро пожаловать")
+    await state.reset_state(with_data=True)
+
+
 async def passenger(callback: CallbackQuery):
 
     await bot.delete_message(
@@ -82,8 +121,7 @@ async def passenger(callback: CallbackQuery):
     await PassengerFSM.full_name.set()
 
 
-async def full_name_passender(message: Message, state: FSMContext):
-
+async def full_name_passenger(message: Message, state: FSMContext):
     if len(message.text.split(' ')) != 3:
         await message.answer('Неверно введен ФИО!')
         return
@@ -98,7 +136,7 @@ async def full_name_passender(message: Message, state: FSMContext):
     await PassengerFSM.phone.set()
 
 
-async def phone_driver_and_pass(message: Message, state: FSMContext):
+async def phone_pass(message: Message, state: FSMContext):
     if not message.text.isdigit():
         await message.answer("Неверный номер!")
         return
@@ -126,5 +164,6 @@ def register_login_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(passenger, text="passenger")
     dp.register_message_handler(car_mark, state=DriverFSM.car_mark)
     dp.register_message_handler(driver_number, state=DriverFSM.car_numbers)
-    dp.register_message_handler(full_name_passender, state=PassengerFSM.full_name)
-    dp.register_message_handler(phone_driver_and_pass, state=PassengerFSM.phone)
+    dp.register_message_handler(full_name_passenger, state=PassengerFSM.full_name)
+    dp.register_message_handler(phone_driver, state=DriverFSM.phone)
+    dp.register_message_handler(phone_pass, state=PassengerFSM.phone)
