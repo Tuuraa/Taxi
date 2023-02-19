@@ -43,9 +43,9 @@ async def create_withdraw(user_id, amount, bank_type, card):
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            'insert into withdrows (user_id, amount, type_bank, card, status) '
-            'values (%s, %s, %s, %s, %s) ',
-            (user_id, amount, bank_type, card, 'WAITING')
+            'insert into withdrows (user_id, amount, type_bank, card, date, status) '
+            'values (%s, %s, %s, %s, %s, %s) ',
+            (user_id, amount, bank_type, card, date, 'WAITING')
         )
 
         await connection.commit()
