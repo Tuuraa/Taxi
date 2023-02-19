@@ -25,3 +25,7 @@ class CreateRequestWithdrowFSM(StatesGroup):
     type_bank = State()
     card = State()
     amount = State()
+
+
+class TopUpFSM(StatesGroup):
+    amount = State()
