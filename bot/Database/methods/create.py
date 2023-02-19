@@ -51,3 +51,16 @@ async def create_withdraw(user_id, amount, bank_type, card, date):
         )
 
         await connection.commit()
+
+
+async def create_refill(user_id, sum, date):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'insert into topup (user_id, sum, date)'
+            'values (%s, %s, %s)',
+            (user_id, sum, date)
+        )
+
+        await connection.commit()
