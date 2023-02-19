@@ -98,3 +98,42 @@ async def all_active_orders(republic):
 
         result = await cursor.fetchall()
         return result
+
+
+async def information_by_user(user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from users where user_id = %s",
+            user_id
+        )
+
+        result = await cursor.fetchone()
+        return result
+
+
+async def information_by_driver(user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from drivers where user_id = %s",
+            user_id
+        )
+
+        result = await cursor.fetchone()
+        return result
+
+
+async def information_by_order(id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from orders where id = %s",
+            id
+        )
+
+        result = await cursor.fetchone()
+        return result
