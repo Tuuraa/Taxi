@@ -11,3 +11,15 @@ async def change_status_to_order(status, id):
         )
 
         await connection.commit()
+
+
+async def add_top_up(user_id, amount):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update users set balance = balance + %s where user_id = %s',
+            (amount, user_id)
+        )
+
+        await connection.commit()
