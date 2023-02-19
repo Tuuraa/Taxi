@@ -51,7 +51,7 @@ async def profile(message: Message, state: FSMContext):
             f'🤖 Ваш ID: <b>{user_data[1][0]}</b>\n'
             f'👤 ФИО: <b>{user_data[1][1]}\n</b>'
             f'📱 Телефон: <b>{user_data[1][2]}</b>\n'
-            f'Баланс: <b>{user_data[1][3]}<b> руб.\n',
+            f'Баланс: <b>{user_data[1][3]}</b> руб.\n',
             parse_mode='html',
             reply_markup=inline.profile_passenger_btn()
         )
@@ -238,3 +238,4 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     register_login_handlers(dp)
     registration_withdrow_handlers(dp)
+    register_refill_handlers(dp)
