@@ -1,6 +1,5 @@
 from asyncio import Lock
 
-import callback as callback
 from aiogram import Dispatcher
 from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
@@ -32,13 +31,11 @@ def profile_driver_btn(callback: CallbackQuery):
 
 async def draw_amount(message: Message, state: FSMContext):
 
-    await bot.delete_message(
-       callback.from_user.id,
-       callback.message.message_id
-    )
+    async with state.proxy() as proxy:
+        proxy['amount'] = message.text
 
     await bot.send_message(
-       callback.from_user.id,
+       message.from_user.id,
        "Выберите тип банка",
        reply_markup=inline.type_bank_btn
     )
@@ -47,18 +44,34 @@ async def draw_amount(message: Message, state: FSMContext):
 
 
 async def sber_type(callback: CallbackQuery, state: FSMContext):
+
+    async with state.proxy() as proxy:
+        proxy["type_bank"] = "sber"
+
     await bot.delete_message(
         callback.from_user.id,
         callback.message.message_id
     )
+
+    await bot.send_message(
+        callback.from_user.id,
+        ''
+    )
+
+
+async def tink_type(callback: CallbackQuery, state: FSMContext):
     async with state.proxy() as proxy:
-        proxy["type_bank"] = "sber"
+        proxy["type_bank"] = "tink"
 
-   await bot.send_message(
-       callback.from_user.id,
-   )
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
 
-
+    await bot.send_message(
+        callback.from_user.id,
+        ''
+    )
 
 
 def registration_withdrow_btns(dp: Dispatcher):
