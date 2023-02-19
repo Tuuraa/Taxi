@@ -42,8 +42,10 @@ async def car_mark(message: Message, state: FSMContext):
 
 
 async def driver_number(message: Message, state: FSMContext):
-    if len(message.text.split(' ')) != 4:
-        await message.answer('Неверно введен гос номер!')
+    gos_number = message.text.split(' ')
+    if len(gos_number) != 4 or len(gos_number[0]) != 1 or len(gos_number[2]) != 3 \
+            or len(gos_number[3]) != 2 or 3 < len(gos_number[4]) < 0:
+        await message.answer('Неверно введен гос. номер!')
         return
 
     async with state.proxy() as proxy:
