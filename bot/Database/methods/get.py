@@ -39,7 +39,7 @@ async def profile_data(user_id):
             return 'pass', result
         else:
             await cursor.execute(
-                'select user_id, full_name, number, car, car_number, balance from drivers where user_id = %s',
+                'select user_id, full_name, number, car, car_number, republic, balance from drivers where user_id = %s',
                 user_id
             )
 
