@@ -17,7 +17,7 @@ def profile_driver_markup():
         KeyboardButton('👤 Профиль'),
         KeyboardButton('🚕 Активные заказы')
     ).add(
-        KeyboardButton('Техническая поддержка')
+        KeyboardButton('⚙️ Техническая поддержка')
     )
 
 
