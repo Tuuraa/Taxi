@@ -15,7 +15,7 @@ import bot.keyboards.inline as inline
 lock = Lock()
 
 
-def profile_driver_btn(callback: CallbackQuery):
+async def profile_driver_btn(callback: CallbackQuery):
     await bot.delete_message(
         callback.from_user.id,
         callback.message.message_id
@@ -49,7 +49,7 @@ async def draw_amount(message: Message, state: FSMContext):
     await bot.send_message(
        message.from_user.id,
        "Выберите тип банка",
-       reply_markup=inline.type_bank_btn
+       reply_markup=inline.type_bank_btn()
     )
 
     await CreateRequestWithdrowFSM.type_bank.set()
@@ -70,12 +70,22 @@ async def sber_type(callback: CallbackQuery, state: FSMContext):
         'Введите номер карты'
     )
 
+    await CreateRequestWithdrowFSM.card.set()
+
 
 async def sber_card(message: Message, state: FSMContext):
     async with state.proxy() as proxy:
-        proxy["card"] = str(message.text)
 
-    await message.answer("Запрос на вывод успешно отправлен,в течении часа ожидайте подтверждения")
+        await db_create.create_withdraw(
+            message.from_user.id,
+            int(proxy['amount']),
+            proxy['type_bank'],
+            message.text
+        )
+
+        await message.answer("Запрос на вывод успешно отправлен, в течении часа ожидайте подтверждения")
+
+    await state.reset_state(with_data=True)
 
 
 async def tink_type(callback: CallbackQuery, state: FSMContext):
@@ -92,15 +102,29 @@ async def tink_type(callback: CallbackQuery, state: FSMContext):
         'Введите номер карты'
     )
 
+    await CreateRequestWithdrowFSM.card.set()
 
-async def tink_card(message: Message, state:FSMContext):
+
+async def tink_card(message: Message, state: FSMContext):
     async with state.proxy() as proxy:
-        proxy["card"] = str(message.text)
 
-    await message.answer("Запрос на вывод успешно отправлен,в течении часа ожидайте подтверждения")
+        await db_create.create_withdraw(
+            message.from_user.id,
+            int(proxy['amount']),
+            proxy['type_bank'],
+            message.text
+        )
+
+        await message.answer("Запрос на вывод успешно отправлен, в течении часа ожидайте подтверждения")
+
+    await state.reset_state(with_data=True)
 
 
-def registration_withdrow_btns(dp: Dispatcher):
-    dp.register_callback_query_handler(profile_driver_btn, text="withdraw_btn")
-    dp.register_callback_query_handler(sber_type,)
-    dp.register_message_handler(sber_card,)
+def registration_withdrow_handlers(dp: Dispatcher):
+    dp.register_callback_query_handler(profile_driver_btn, text="withdraw")
+    dp.register_message_handler(draw_amount, state=CreateRequestWithdrowFSM.amount)
+    dp.register_callback_query_handler(sber_type, state=CreateRequestWithdrowFSM.type_bank, text='sber_type_amount')
+    dp.register_callback_query_handler(tink_type, state=CreateRequestWithdrowFSM.type_bank, text='tink_type_amount')
+    dp.register_message_handler(sber_card, state=CreateRequestWithdrowFSM.card)
+    dp.register_message_handler(tink_card, state=CreateRequestWithdrowFSM.card)
+
