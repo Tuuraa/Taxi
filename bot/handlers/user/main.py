@@ -62,7 +62,8 @@ async def profile(message: Message, state: FSMContext):
             f'📱 Телефон: <b>{user_data[1][2]}</b>\n\n'
             f'🚗 Марка машины: <b>{user_data[1][3]}</b>\n'
             f'🚕 Номер машины: <b>{user_data[1][4]}</b>\n'
-            f'💰 Баланс: <b>{user_data[1][5]}</b> руб.\n',
+            f'⛰️ Республика: <b>{user_data[1][5]}</b>\n'
+            f'💵 Баланс: <b>{user_data[1][6]}</b> руб.\n',
             parse_mode='html',
             reply_markup=inline.profile_driver_btn()
         )
