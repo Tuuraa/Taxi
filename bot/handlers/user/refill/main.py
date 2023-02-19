@@ -1,6 +1,6 @@
 from asyncio import Lock
 from aiogram import Dispatcher
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, LabeledPrice
 from aiogram.dispatcher import FSMContext
 from datetime import datetime, timezone
 
@@ -37,6 +37,24 @@ async def create_top_up(message: Message, state: FSMContext):
     amount = int(message.text)
 
     #Здесь пиши оплату АБАЗЭ
+    price = LabeledPrice(label="Пополнение", amount=amount * 100)
+
+    if payment_token.split(':')[1] == 'TEST':
+        await bot.send_message(message.chat.id, "Тестовый платеж!!!")
+
+    await bot.send_invoice(message.chat.id,
+                           title="Пополнение счета",
+                           description=f"Пополнение баланса на {amount} руб.",
+                           provider_token=payment_token,
+                           currency="rub",
+                           photo_url="https://www.aroged.com/wp-content/uploads/2022/06/Telegram-has-a-premium-subscription.jpg",
+                           photo_width=416,
+                           photo_height=234,
+                           photo_size=416,
+                           is_flexible=False,
+                           prices=[price],
+                           start_parameter="one-month-subscription",
+                           payload="test-invoice-payload")
 
     await state.reset_state(with_data=True)
 
