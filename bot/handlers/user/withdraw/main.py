@@ -32,13 +32,8 @@ def profile_driver_btn(callback: CallbackQuery):
 
 async def draw_amount(message: Message, state: FSMContext):
 
-    await bot.delete_message(
-       callback.from_user.id,
-       callback.message.message_id
-    )
-
     await bot.send_message(
-       callback.from_user.id,
+       message.from_user.id,
        "Выберите тип банка",
        reply_markup=inline.type_bank_btn
     )
@@ -51,12 +46,16 @@ async def sber_type(callback: CallbackQuery, state: FSMContext):
         callback.from_user.id,
         callback.message.message_id
     )
+
     async with state.proxy() as proxy:
         proxy["type_bank"] = "sber"
 
+
    await bot.send_message(
-       callback.from_user.id,
+       callback.from_user.id
+
    )
+
 
 
 
