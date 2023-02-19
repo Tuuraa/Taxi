@@ -109,13 +109,14 @@ async def tink_type(callback: CallbackQuery, state: FSMContext):
 
 async def tink_card(message: Message, state: FSMContext):
     async with state.proxy() as proxy:
+        date = datetime.now
 
         await db_create.create_withdraw(
             message.from_user.id,
             int(proxy['amount']),
+            date,
             proxy['type_bank'],
             message.text,
-            datetime.now().date()
         )
 
         await message.answer("Запрос на вывод успешно отправлен, в течении часа ожидайте подтверждения")
