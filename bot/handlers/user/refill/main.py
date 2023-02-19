@@ -1,6 +1,6 @@
 from asyncio import Lock
 from aiogram import Dispatcher
-from aiogram.types import Message, CallbackQuery, LabeledPrice
+from aiogram.types import Message, CallbackQuery, LabeledPrice, ContentType, PreCheckoutQuery
 from aiogram.dispatcher import FSMContext
 from datetime import datetime, timezone
 from aiogram.types.message import ContentType
@@ -13,6 +13,8 @@ from bot.env import *
 
 import bot.Database.methods.create as db_create
 import bot.Database.methods.get as db_select
+import bot.Database.methods.update as db_update
+
 import bot.keyboards.inline as inline
 import bot.keyboards.reply as reply
 
@@ -37,7 +39,6 @@ async def top_up(callback: CallbackQuery):
 async def create_top_up(message: Message, state: FSMContext):
     amount = int(message.text)
 
-    #Здесь пиши оплату АБАЗЭ
     price = LabeledPrice(label="Пополнение", amount=amount * 100)
 
     if payment_token.split(':')[1] == 'TEST':
@@ -60,19 +61,26 @@ async def create_top_up(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
 
-async def  successful_payment(message: Message):
-    print("SUCCESSFUL PAYMENT:")
-    payment_info = message.successful_payment.to_python()
-    for k, v in payment_info.items():
-        print(f"{k} = {v}")
+async def pre_checkout_query(pre_checkout_q: PreCheckoutQuery):
+    await bot.answer_pre_checkout_query(pre_checkout_q.id, ok=True)
+
+
+async def successful_payment(message: Message):
 
     await bot.send_message(message.chat.id,
-                           f"Платеж на сумму"
-                           f" {message.successful_payment.total_amount} "
-                           f"{message.successful_payment.currency} прошел успешно!!!")
+        f"Платеж на сумму "
+        f"{message.successful_payment.total_amount / 100} "
+        f"{message.successful_payment.currency} прошел успешно!!!"
+    )
+    await db_update.add_top_up(
+        message.from_user.id,
+        message.successful_payment.total_amount / 100
+    )
 
 
-def register_refill_handlers(dp:Dispatcher):
+def register_refill_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(top_up, text='top_up')
     dp.register_message_handler(create_top_up, state=TopUpFSM.amount)
-    dp.register_message_handler(content_types=ContentType.SUCCESSFUL_PAYMENT)
+    dp.register_pre_checkout_query_handler(pre_checkout_query, lambda query: True)
+    dp.register_message_handler(successful_payment, content_types=ContentType.SUCCESSFUL_PAYMENT)
+    dp.register_message_handler(successful_payment, content_types=ContentType.SUCCESSFUL_PAYMENT)
