@@ -68,6 +68,7 @@ async def pre_checkout_query(pre_checkout_q: PreCheckoutQuery):
 
 
 async def successful_payment(message: Message):
+    date = datetime.now()
     async with lock:
         await bot.send_message(message.chat.id,
             f"Платеж на сумму "
@@ -77,6 +78,11 @@ async def successful_payment(message: Message):
         await db_update.add_top_up(
             message.from_user.id,
             message.successful_payment.total_amount / 100
+        )
+        await db_create.create_refill(
+            message.from_user.id,
+            message.successful_payment.total_amount,
+            date
         )
 
 
