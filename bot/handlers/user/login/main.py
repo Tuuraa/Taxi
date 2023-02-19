@@ -42,7 +42,7 @@ async def car_mark(message: Message, state: FSMContext):
 
 
 async def driver_number(message: Message, state: FSMContext):
-    if len(message.text.split(' ')) != 3:
+    if len(message.text.split(' ')) != 4:
         await message.answer('Неверно введен гос номер!')
         return
 
