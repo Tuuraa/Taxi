@@ -235,6 +235,7 @@ async def change_republics(callback: CallbackQuery):
         "Выберите республику:",
         reply_markup=reply.all_republics()
     )
+
     await ChangeRepublicFSM.republic.set()
 
 
