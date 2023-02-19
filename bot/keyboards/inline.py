@@ -61,5 +61,5 @@ def responde_order(order):
 
 def cancel_order():
     return InlineKeyboardMarkup().add(
-        InlineKeyboardButton('Отменить заказ', callback_data='test')
+        InlineKeyboardButton('❌ Отменить заказ', callback_data='test')
     )

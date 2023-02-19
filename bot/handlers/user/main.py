@@ -262,7 +262,7 @@ def register_user_handlers(dp: Dispatcher):
                                 content_types=['location', 'text'])
     dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси')
     dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы')
-    dp.register_message_handler(support, lambda mes: mes.text == 'Техническая поддержка')
+    dp.register_message_handler(support, lambda mes: mes.text == '⚙️ Техническая поддержка')
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     register_login_handlers(dp)
     registration_withdrow_handlers(dp)

@@ -23,7 +23,7 @@ async def driver(callback: CallbackQuery):
     )
     await bot.send_message(
         callback.from_user.id,
-        'Введите марку вашего автомобиля',
+        '🚗 Введите марку вашего автомобиля:',
     )
 
     await DriverFSM.car_mark.set()
@@ -36,19 +36,22 @@ async def car_mark(message: Message, state: FSMContext):
 
     await bot.send_message(
         message.from_user.id,
-        'Введите гос номер вашего автомобиля',
+        'Введите гос номер вашего автомобиля:\nПример: А 123 БВ 01',
     )
     await DriverFSM.car_numbers.set()
 
 
 async def driver_number(message: Message, state: FSMContext):
+    if len(message.text.split(' ')) != 4:
+        await message.answer('Неверно введен гос номер!')
+        return
 
     async with state.proxy() as proxy:
         proxy['car_numbers'] = message.text
 
     await bot.send_message(
         message.from_user.id,
-        'Введите ваше полное имя',
+        'Введите ваше полное имя:',
     )
     await DriverFSM.full_name.set()
 
@@ -62,7 +65,7 @@ async def full_name_driver(message: Message, state: FSMContext):
         proxy['full_name'] = message.text
 
     await message.answer(
-        'Выберите республику, в которой вы находитесь',
+        '⛰️ Выберите республику, в которой вы находитесь',
         reply_markup=reply.all_republics()
     )
 
@@ -74,7 +77,7 @@ async def republic_driver(message: Message, state: FSMContext):
         proxy['republic'] = message.text
 
     await message.answer(
-        'Теперь напишите свой номер телефона',
+        '📞 Теперь напишите свой номер телефона',
         reply_markup=ReplyKeyboardRemove()
     )
 
@@ -103,7 +106,7 @@ async def phone_driver(message: Message, state: FSMContext):
         )
 
     await message.answer(
-        "Регистрация прошла успешно!\nДобро пожаловать",
+        "Регистрация прошла успешно!✅ \nДобро пожаловать",
         reply_markup=reply.profile_driver_markup()
     )
     await state.reset_state(with_data=True)
@@ -134,7 +137,7 @@ async def full_name_passenger(message: Message, state: FSMContext):
         proxy['full_name'] = message.text
 
     await message.answer(
-        'Теперь напишите свой номер телефона'
+        '📞 Теперь напишите свой номер телефона'
     )
 
     await PassengerFSM.phone.set()
@@ -159,7 +162,7 @@ async def phone_pass(message: Message, state: FSMContext):
         )
 
     await message.answer(
-        "Регистрация прошла успешно!\nДобро пожаловать",
+        "Регистрация прошла успешно!✅ \nДобро пожаловать",
         reply_markup=reply.profile_passenger_markup()
     )
     await state.reset_state(with_data=True)

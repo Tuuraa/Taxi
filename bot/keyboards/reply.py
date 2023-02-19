@@ -17,8 +17,8 @@ def profile_driver_markup():
         KeyboardButton('👤 Профиль'),
         KeyboardButton('🚕 Активные заказы')
     ).add(
-        KeyboardButton('Техническая поддержка'),
-    ).add
+        KeyboardButton('⚙️ Техническая поддержка')
+    )
 
 
 def set_current_locale():
@@ -41,4 +41,3 @@ def all_republics():
         reply.add(republic)
 
     return reply
-
