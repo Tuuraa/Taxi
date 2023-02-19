@@ -54,7 +54,7 @@ async def balance_of_driver(user_id):
         await cursor.execute(
             'select balance from drivers where user_id = %s', user_id
         )
-        result = await cursor.fetchone
+        result = await cursor.fetchone()
         return result[0]
 
 
