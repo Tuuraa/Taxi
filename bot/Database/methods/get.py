@@ -47,12 +47,23 @@ async def profile_data(user_id):
             return 'drive', result
 
 
-async def balance_of_driver(user_id):
+async def balance_by_driver(user_id):
     connection, cursor = await async_connect_to_my_sql()
 
     async with connection.cursor() as cursor:
         await cursor.execute(
             'select balance from drivers where user_id = %s', user_id
+        )
+        result = await cursor.fetchone()
+        return result[0]
+
+
+async def balance_by_user(user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'select balance from users where user_id = %s', user_id
         )
         result = await cursor.fetchone()
         return result[0]

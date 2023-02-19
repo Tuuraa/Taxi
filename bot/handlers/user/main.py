@@ -123,22 +123,51 @@ async def order_location(message: Message, state: FSMContext):
             order_point=second_loc
         ).m, 3)
 
+        proxy['distance'] = distance
+        proxy['amount'] = distance * 0.6
+
         await message.answer(
-            f'Расстояние состовляет: {distance} м.',
-            reply_markup=reply.profile_passenger_markup() if user_data == 'passenger' else reply.profile_driver_markup()
+            f'Расстояние состовляет: {distance} м.\n'
+            f'Сумма к оплате {distance * 0.6}\n'
+            f'Выберите каким образом будете оплачивать',
+            reply_markup=inline.pay_order()
         )
 
-        await db_create.create_order(
-            message.from_user.id,
-            proxy["current_location"][0],
-            location[0],
-            distance,
-            distance * 1.5,
-            republic,
-            datetime.now()
-        )
+        # await db_create.create_order(
+        #     message.from_user.id,
+        #     proxy["current_location"][0],
+        #     location[0],
+        #     distance,
+        #     distance * 1.5,
+        #     republic,
+        #     datetime.now()
+        # )
 
-    await state.reset_state(with_data=True)
+    # await state.reset_state(with_data=True)
+
+
+async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
+    async with state.proxy() as proxy:
+        proxy['type_pay'] = 'cash'
+
+        user_amount = await db_select.balance_by_user(callback.from_user.id)
+
+        if user_amount < int(proxy['amount']):
+            await bot.send_message(
+                callback.from_user.id,
+                'Недостаточно средств для заказа такси. Необходимо пополнить баланс, либо выбрать другой тип оплаты',
+                reply_markup=inline.profile_passenger_btn()
+            )
+            return
+
+        # Прописать снятие денег TODO
+
+        # Продумать эту блядскую систему TODO
+
+
+async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
+    async with state.proxy() as proxy:
+        proxy['type_pay'] = 'wallet'
 
 
 async def order_taxi(message: Message):
@@ -267,6 +296,8 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси')
     dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы')
     dp.register_message_handler(support, lambda mes: mes.text == '⚙️ Техническая поддержка')
+    dp.register_callback_query_handler(pay_by_cash, text='pay_by_cash', state=UserLocationFSM.type_pay)
+    dp.register_callback_query_handler(pay_by_wallet, text='pay_by_wallet', state=UserLocationFSM.type_pay)
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     register_login_handlers(dp)
     registration_withdrow_handlers(dp)

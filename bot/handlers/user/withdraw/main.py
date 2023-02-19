@@ -39,7 +39,7 @@ async def draw_amount(message: Message, state: FSMContext):
         await message.answer("Слишком большая сумма вывода")
         return
 
-    balance = await db_select.balance_of_driver(message.from_user.id)
+    balance = await db_select.balance_by_driver(message.from_user.id)
     if int(message.text) > balance:
         await message.answer("Не достаточно средств")
         return
