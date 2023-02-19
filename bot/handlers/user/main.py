@@ -232,7 +232,7 @@ async def change_republics(callback: CallbackQuery):
     )
     await bot.send_message(
         callback.from_user.id,
-        "dadadadadqwdqaw wfdqwfg",
+        "Выберите республику:",
         reply_markup=reply.all_republics()
     )
     await ChangeRepublicFSM.republic.set()
