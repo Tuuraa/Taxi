@@ -5,6 +5,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
 from bot.env import *
 
+from datetime import datetime
 
 from bot.states import CreateRequestWithdrowFSM
 import bot.Database.methods.create as db_create
@@ -80,7 +81,8 @@ async def sber_card(message: Message, state: FSMContext):
             message.from_user.id,
             int(proxy['amount']),
             proxy['type_bank'],
-            message.text
+            message.text,
+            datetime.now().date()
         )
 
         await message.answer("Запрос на вывод успешно отправлен, в течении часа ожидайте подтверждения")
@@ -107,12 +109,14 @@ async def tink_type(callback: CallbackQuery, state: FSMContext):
 
 async def tink_card(message: Message, state: FSMContext):
     async with state.proxy() as proxy:
+        date = datetime.now
 
         await db_create.create_withdraw(
             message.from_user.id,
             int(proxy['amount']),
+            date,
             proxy['type_bank'],
-            message.text
+            message.text,
         )
 
         await message.answer("Запрос на вывод успешно отправлен, в течении часа ожидайте подтверждения")
