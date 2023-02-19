@@ -16,6 +16,7 @@ from bot.handlers.utils import *
 
 from .login import register_login_handlers
 from .refill import register_refill_handlers
+from .withdraw import registration_withdrow_handlers
 
 from bot.env import *
 from ...states import UserLocationFSM
@@ -50,7 +51,7 @@ async def profile(message: Message, state: FSMContext):
             f'🤖 Ваш ID: <b>{user_data[1][0]}</b>\n'
             f'👤 ФИО: <b>{user_data[1][1]}\n</b>'
             f'📱 Телефон: <b>{user_data[1][2]}</b>\n'
-            f'Баланс: <b>{user_data[1][3]}<b>\n',
+            f'Баланс: <b>{user_data[1][3]}<b> руб.\n',
             parse_mode='html',
             reply_markup=inline.profile_passenger_btn()
         )
@@ -61,7 +62,7 @@ async def profile(message: Message, state: FSMContext):
             f'📱 Телефон: <b>{user_data[1][2]}</b>\n\n'
             f'🚗 Марка машины: <b>{user_data[1][3]}</b>\n'
             f'🚕 Номер машины: <b>{user_data[1][4]}</b>\n'
-            f'Баланс: <b>{user_data[1][5]}</b>\n',
+            f'Баланс: <b>{user_data[1][5]}</b> руб.\n',
             parse_mode='html',
             reply_markup=inline.profile_driver_btn()
         )
@@ -236,3 +237,4 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(support, lambda mes: mes.text == 'Техническая поддержка')
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     register_login_handlers(dp)
+    registration_withdrow_handlers(dp)
