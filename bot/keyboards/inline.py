@@ -4,7 +4,7 @@ from aiogram.utils.callback_data import CallbackData
 import bot.Database.methods.get as db_select
 
 
-cb_data = CallbackData('ibk', 'user_id', 'data')
+cb_data = CallbackData('ibk', 'user_id', 'id_order', 'data')
 
 
 def check_status_btns():
@@ -47,7 +47,20 @@ def type_bank_btn():
     return inline
 
 
-def responde_order():
+def responde_order(order):
     return InlineKeyboardMarkup().add(
-        InlineKeyboardButton('✌ Отозваться', callback_data='test')
+        InlineKeyboardButton(
+            '✌ Отозваться',
+            callback_data=cb_data.new(
+                user_id=order[5],
+                id_order=order[0],
+                data='responde'
+            )
+        )
+    )
+
+
+def cancel_order():
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton('Отменить заказ', callback_data='test')
     )
