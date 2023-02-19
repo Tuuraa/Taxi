@@ -36,12 +36,15 @@ async def car_mark(message: Message, state: FSMContext):
 
     await bot.send_message(
         message.from_user.id,
-        'Введите гос номер вашего автомобиля:',
+        'Введите гос номер вашего автомобиля:\nПример: А 123 БВ 01',
     )
     await DriverFSM.car_numbers.set()
 
 
 async def driver_number(message: Message, state: FSMContext):
+    if len(message.text.split(' ')) != 3:
+        await message.answer('Неверно введен гос номер!')
+        return
 
     async with state.proxy() as proxy:
         proxy['car_numbers'] = message.text
