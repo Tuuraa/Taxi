@@ -20,6 +20,7 @@ from .withdraw import registration_withdrow_handlers
 
 from bot.env import *
 from ...states import UserLocationFSM
+from ...states import ChangeRepublicFSM
 
 
 async def star_login(message: Message, state: FSMContext):
@@ -225,10 +226,41 @@ async def responde(callback: CallbackQuery):
     )
 
 
+async def change_republics(callback: CallbackQuery):
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+    await bot.send_message(
+        callback.from_user.id,
+        "Выберите республику:",
+        reply_markup=reply.all_republics()
+    )
+
+    await ChangeRepublicFSM.republic.set()
+
+
+async def new_republic(message: Message, state: FSMContext):
+
+    await db_update.change_region(
+        message.from_user.id,
+        message.text
+    )
+
+    await message.answer(
+        'Республика успешно изменена',
+        reply_markup=reply.profile_driver_markup()
+    )
+
+    await state.reset_state(with_data=True)
+
+
 def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(star_login, commands=['start'], state='*')
     dp.register_message_handler(profile, lambda msg: msg.text == '👤 Профиль', state="*")
     dp.register_message_handler(back, lambda mes: mes.text == '⬅️ Вернуться', state='*')
+    dp.register_callback_query_handler(change_republics, text='change_region')
+    dp.register_message_handler(new_republic, state=ChangeRepublicFSM.republic)
     dp.register_message_handler(current_user_location_handler, state=UserLocationFSM.current_location,
                                 content_types=['location', 'text'])
     dp.register_message_handler(order_location, state=UserLocationFSM.order_location,

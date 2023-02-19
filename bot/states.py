@@ -9,6 +9,7 @@ class DriverFSM(StatesGroup):
     phone = State()
 
 
+
 class PassengerFSM(StatesGroup):
     full_name = State()
     phone = State()
@@ -29,3 +30,7 @@ class CreateRequestWithdrowFSM(StatesGroup):
 
 class TopUpFSM(StatesGroup):
     amount = State()
+
+
+class ChangeRepublicFSM(StatesGroup):
+    republic = State()

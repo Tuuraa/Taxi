@@ -23,3 +23,15 @@ async def add_top_up(user_id, amount):
         )
 
         await connection.commit()
+
+
+async def change_region(user_id, republic):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set republic = %s where user_id = %s',
+            (republic, user_id)
+        )
+
+        await connection.commit()

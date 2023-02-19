@@ -32,7 +32,8 @@ def profile_passenger_btn():
 
 def profile_driver_btn():
     return InlineKeyboardMarkup().add(
-        InlineKeyboardButton('💰 Вывести', callback_data='withdraw')
+        InlineKeyboardButton('💰 Вывести', callback_data='withdraw'),
+        InlineKeyboardButton("Сменить республику", callback_data="change_region")
     )
 
 

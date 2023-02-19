@@ -44,19 +44,21 @@ async def create_top_up(message: Message, state: FSMContext):
     if payment_token.split(':')[1] == 'TEST':
         await bot.send_message(message.chat.id, "Тестовый платеж!!!")
 
-    await bot.send_invoice(message.chat.id,
-                           title="Пополнение счета",
-                           description=f"Пополнение баланса на {amount} руб.",
-                           provider_token=payment_token,
-                           currency="rub",
-                           photo_url="https://www.aroged.com/wp-content/uploads/2022/06/Telegram-has-a-premium-subscription.jpg",
-                           photo_width=416,
-                           photo_height=234,
-                           photo_size=416,
-                           is_flexible=False,
-                           prices=[price],
-                           start_parameter="one-month-subscription",
-                           payload="test-invoice-payload")
+    await bot.send_invoice(
+        message.chat.id,
+        title="Пополнение счета",
+        description=f"Пополнение баланса на {amount} руб.",
+        provider_token=payment_token,
+        currency="rub",
+        photo_url="https://www.aroged.com/wp-content/uploads/2022/06/Telegram-has-a-premium-subscription.jpg",
+        photo_width=416,
+        photo_height=234,
+        photo_size=416,
+        is_flexible=False,
+        prices=[price],
+        start_parameter="one-month-subscription",
+        payload="test-invoice-payload"
+    )
 
     await state.reset_state(with_data=True)
 
@@ -66,16 +68,16 @@ async def pre_checkout_query(pre_checkout_q: PreCheckoutQuery):
 
 
 async def successful_payment(message: Message):
-
-    await bot.send_message(message.chat.id,
-        f"Платеж на сумму "
-        f"{message.successful_payment.total_amount / 100} "
-        f"{message.successful_payment.currency} прошел успешно!!!"
-    )
-    await db_update.add_top_up(
-        message.from_user.id,
-        message.successful_payment.total_amount / 100
-    )
+    async with lock:
+        await bot.send_message(message.chat.id,
+            f"Платеж на сумму "
+            f"{message.successful_payment.total_amount / 100} "
+            f"{message.successful_payment.currency} прошел успешно!!!"
+        )
+        await db_update.add_top_up(
+            message.from_user.id,
+            message.successful_payment.total_amount / 100
+        )
 
 
 def register_refill_handlers(dp: Dispatcher):
