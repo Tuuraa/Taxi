@@ -7,6 +7,8 @@ from aiogram.dispatcher import FSMContext
 
 import bot.Database.methods.create as db_create
 import bot.Database.methods.get as db_select
+import bot.Database.methods.update as db_update
+
 import bot.keyboards.inline as inline
 import bot.keyboards.reply as reply
 
@@ -59,7 +61,7 @@ async def profile(message: Message, state: FSMContext):
             f'📱 Телефон: <b>{user_data[1][2]}</b>\n\n'
             f'🚗 Марка машины: <b>{user_data[1][3]}</b>\n'
             f'🚕 Номер машины: <b>{user_data[1][4]}</b>\n'
-            f'Баланс: <b>{user_data[1][5]}<b>\n',
+            f'Баланс: <b>{user_data[1][5]}</b>\n',
             parse_mode='html',
             reply_markup=inline.profile_driver_btn()
         )
@@ -167,6 +169,11 @@ async def active_orders(message: Message):
 
     orders = await db_select.all_active_orders(republic)
 
+    if not orders:
+        await message.answer(
+            'На данный момент заказов нет'
+        )
+
     for order in orders:
         await message.answer(
             f'Заказ №{order[0]}\n\n'
@@ -175,8 +182,45 @@ async def active_orders(message: Message):
             f'Дистанция: {order[3]} м.\n'
             f'Оплата: {order[4]} руб.\n'
             f'Дата создания заявки: {order[8]}',
-            reply_markup=inline.responde_order()
+            reply_markup=inline.responde_order(order)
         )
+
+
+async def responde(callback: CallbackQuery):
+
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    order_data = callback.data.split(':')
+
+    user_data = await db_select.information_by_user(int(order_data[1]))
+    order_data_by_db = await db_select.information_by_order(int(order_data[2]))
+    order_user_data = await db_select.information_by_driver(callback.from_user.id)
+
+    await db_update.change_status_to_order('PROCESSING', order_data[2])
+
+    await bot.send_message(
+        int(order_data[1]),
+        f'Ваш заказ был принят водителем @{callback.from_user.username}\n\n'
+        f'Данные о нем:\n'
+        f'Телефон: <b>{order_user_data[5]}</b>\n'
+        f'Марка машины: <b>{order_user_data[3]}</b>\n'
+        f'Номер машины: <b>{order_user_data[4]}</b>',
+        parse_mode='html'
+    )
+
+    await bot.send_message(
+        callback.from_user.id,
+        'Данные о заказе:\n\n'
+        f'Откуда: {order_data_by_db[1]}\n\n'
+        f'Куда: {order_data_by_db[2]}\n\n'
+        f'Телефон пассажира: <b>{user_data[3]}</b>\n'
+        f'Ссылка: @{user_data[4]}\n',
+        reply_markup=inline.cancel_order(),
+        parse_mode='html'
+    )
 
 
 def register_user_handlers(dp: Dispatcher):
@@ -190,4 +234,5 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси')
     dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы')
     dp.register_message_handler(support, lambda mes: mes.text == 'Техническая поддержка')
+    dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     register_login_handlers(dp)
