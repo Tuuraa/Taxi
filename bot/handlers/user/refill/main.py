@@ -3,6 +3,7 @@ from aiogram import Dispatcher
 from aiogram.types import Message, CallbackQuery, LabeledPrice
 from aiogram.dispatcher import FSMContext
 from datetime import datetime, timezone
+from aiogram.types.message import ContentType
 
 import arrow
 
@@ -59,6 +60,19 @@ async def create_top_up(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
 
+async def  successful_payment(message: Message):
+    print("SUCCESSFUL PAYMENT:")
+    payment_info = message.successful_payment.to_python()
+    for k, v in payment_info.items():
+        print(f"{k} = {v}")
+
+    await bot.send_message(message.chat.id,
+                           f"Платеж на сумму"
+                           f" {message.successful_payment.total_amount} "
+                           f"{message.successful_payment.currency} прошел успешно!!!")
+
+
 def register_refill_handlers(dp:Dispatcher):
     dp.register_callback_query_handler(top_up, text='top_up')
     dp.register_message_handler(create_top_up, state=TopUpFSM.amount)
+    dp.register_message_handler(content_types=ContentType.SUCCESSFUL_PAYMENT)
