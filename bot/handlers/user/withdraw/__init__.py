@@ -1,1 +1,1 @@
-from .main import register_withdraw_handlers
+from .main import registration_withdrow_handlers
