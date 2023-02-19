@@ -24,5 +24,4 @@ class UserLocationFSM(StatesGroup):
 class CreateRequestWithdrowFSM(StatesGroup):
     type_bank = State()
     card = State()
-    wallet = State()
     amount = State()

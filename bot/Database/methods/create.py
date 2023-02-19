@@ -36,3 +36,16 @@ async def create_order(user_id, user_location, order_location, distance, amount,
         )
 
         await connection.commit()
+
+
+async def create_withdrow(user_id, amount, bank_type, card ):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'insert into withdrows (user_id, amount, bank_type, card, status) '
+            'values (%s, %s, %s, %s, %s) ',
+            (user_id, amount , bank_type, card, 'WAITING')
+        )
+
+        await connection.commit()

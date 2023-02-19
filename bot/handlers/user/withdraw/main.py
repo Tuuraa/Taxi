@@ -30,9 +30,21 @@ def profile_driver_btn(callback: CallbackQuery):
 
 
 async def draw_amount(message: Message, state: FSMContext):
+    if not message.text.isdigit():
+        await message.answer("Это не число")
+        return
+
+    if int(message.text) > 100000:
+        await message.answer("Слишком большая сумма вывода")
+        return
+
+    balance = await db_select.balance_of_driver(message.from_user.id)
+    if int(message.text) > balance:
+        await message.answer("Не достаточно средств")
+        return
 
     async with state.proxy() as proxy:
-        proxy['amount'] = message.text
+        proxy["amount"] = int(message.text)
 
     await bot.send_message(
        message.from_user.id,
@@ -55,8 +67,15 @@ async def sber_type(callback: CallbackQuery, state: FSMContext):
 
     await bot.send_message(
         callback.from_user.id,
-        ''
+        'Введите номер карты'
     )
+
+
+async def sber_card(message: Message, state: FSMContext):
+    async with state.proxy() as proxy:
+        proxy["card"] = str(message.text)
+
+    await message.answer("Запрос на вывод успешно отправлен,в течении часа ожидайте подтверждения")
 
 
 async def tink_type(callback: CallbackQuery, state: FSMContext):
@@ -70,10 +89,18 @@ async def tink_type(callback: CallbackQuery, state: FSMContext):
 
     await bot.send_message(
         callback.from_user.id,
-        ''
+        'Введите номер карты'
     )
+
+
+async def tink_card(message: Message, state:FSMContext):
+    async with state.proxy() as proxy:
+        proxy["card"] = str(message.text)
+
+    await message.answer("Запрос на вывод успешно отправлен,в течении часа ожидайте подтверждения")
 
 
 def registration_withdrow_btns(dp: Dispatcher):
     dp.register_callback_query_handler(profile_driver_btn, text="withdraw_btn")
     dp.register_callback_query_handler(sber_type,)
+    dp.register_message_handler(sber_card,)
