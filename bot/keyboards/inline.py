@@ -63,3 +63,11 @@ def cancel_order():
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton('❌ Отменить заказ', callback_data='test')
     )
+
+
+def pay_order():
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton('Заплатить наличными', callback_data='pay_by_cash')
+    ).add(
+        InlineKeyboardButton('Снять с баланса бота', callback_data='pay_by_wallet')
+    )

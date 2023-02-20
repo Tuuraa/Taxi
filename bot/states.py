@@ -9,7 +9,6 @@ class DriverFSM(StatesGroup):
     phone = State()
 
 
-
 class PassengerFSM(StatesGroup):
     full_name = State()
     phone = State()
@@ -20,6 +19,9 @@ class UserLocationFSM(StatesGroup):
     order_location = State()
     agreed_location = State()
     disagree_location = State()
+    distance = State()
+    amount = State()
+    type_pay = State()
 
 
 class CreateRequestWithdrowFSM(StatesGroup):
