@@ -147,6 +147,83 @@ async def order_location(message: Message, state: FSMContext):
     # await state.reset_state(with_data=True)
 
 
+async def current_del_location_handler(message: Message, state: FSMContext):
+    location = current_user_location(message)
+
+    async with state.proxy() as proxy:
+        proxy['current_location'] = location[0], location[1], location[2]
+
+    await message.answer(
+        "А теперь куда хотите доставить.\n"
+        "Для этого нажмите на скрепку 📎, и оправьте локацию, куда хотите поехать",
+        reply_markup=reply.order_location()
+    )
+
+    await UserLocationFSM.next()
+
+
+async def del_order_location(message: Message, state: FSMContext):
+    location = current_user_location(message)
+
+    async with state.proxy() as proxy:
+        proxy['order_location'] = location[0], location[1], location[2]
+
+        location_list = proxy['current_location'][0].address.split(', ')
+        republic = ''
+        user_data = await db_select.type_user(message.from_user.id)
+
+        for loc in location_list:
+            if loc in republics:
+                republic = loc
+                break
+
+        if not republic:
+            await message.answer(
+                'В данном регионе этот сервис не работает!!',
+                reply_markup=reply.profile_passenger_markup() if user_data == 'passenger' else reply.profile_driver_markup()
+            )
+            await state.reset_state(with_data=True)
+            return
+
+        await message.answer(
+            f'Откуда:\n{proxy["current_location"][0]}'
+        )
+
+        await message.answer(
+            f'Куда:\n{location[0]}'
+        )
+
+        first_loc = proxy['current_location'][1], proxy['current_location'][2]
+        second_loc = proxy['order_location'][1], proxy['order_location'][2]
+
+        distance = round(distance_btw_two_points(
+            current_point=first_loc,
+            order_point=second_loc
+        ).m, 3)
+
+        proxy['distance'] = distance
+        proxy['amount'] = distance * 0.6
+
+        await message.answer(
+            f'Расстояние состовляет: {distance} м.\n'
+            f'Сумма к оплате {distance * 0.6}\n'
+            f'Выберите каким образом будете оплачивать',
+            reply_markup=inline.pay_order()
+        )
+
+        await db_create.create_delivery(
+             message.from_user.id,
+             proxy["current_location"][0],
+             location[0],
+             distance,
+             distance * 1.5,
+             republic,
+             datetime.now()
+         )
+
+        await state.reset_state(with_data=True)
+
+
 async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
     async with state.proxy() as proxy:
         proxy['type_pay'] = 'cash'
@@ -169,6 +246,14 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
 async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
     async with state.proxy() as proxy:
         proxy['type_pay'] = 'wallet'
+
+
+async def order_del(message: Message):
+    await message.answer(
+        'Отправьте локацию, либо пропишите ее вручную',
+        reply_markup=reply.set_current_locale()
+    )
+    await UserLocationFSM.current_location.set()
 
 
 async def order_taxi(message: Message):
@@ -294,7 +379,12 @@ def register_user_handlers(dp: Dispatcher):
                                 content_types=['location', 'text'])
     dp.register_message_handler(order_location, state=UserLocationFSM.order_location,
                                 content_types=['location', 'text'])
+    dp.register_message_handler(current_del_location_handler,  state=UserLocationFSM.current_location,
+                                content_types=['location', 'text'])
+    dp.register_message_handler(del_order_location, state=UserLocationFSM.order_location,
+                                content_types=['location', 'text'])
     dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси')
+    dp.register_message_handler(order_del, lambda mes: mes.text == 'Заказать доставку')
     dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы')
     dp.register_message_handler(support, lambda mes: mes.text == '⚙️ Техническая поддержка')
     dp.register_callback_query_handler(pay_by_cash, text='pay_by_cash', state=UserLocationFSM.type_pay)

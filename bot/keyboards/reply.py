@@ -8,7 +8,8 @@ def profile_passenger_markup():
         KeyboardButton('👤 Профиль'),
         KeyboardButton('🚕 Заказать такси')
     ).add(
-        KeyboardButton('Техническая поддержка')
+        KeyboardButton('Техническая поддержка'),
+        KeyboardButton('Заказать доставку')
     )
 
 
