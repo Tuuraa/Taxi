@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.31, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: taxi
 -- ------------------------------------------------------
--- Server version	8.0.31
+-- Server version	8.0.32
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -28,10 +28,11 @@ CREATE TABLE `users` (
   `full_name` varchar(90) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `number` varchar(15) NOT NULL,
   `link` varchar(45) NOT NULL,
-  `date_reg` date NOT NULL,
+  `date_reg` datetime NOT NULL,
   `balance` float DEFAULT NULL,
+  `userscol` varchar(45) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +41,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (6,803270707,'Джандаров Роберт Анзорович','79380339965','Arrrrrrriva','2023-02-18',NULL),(8,855151774,'Карданов Артур Ауесович','89897898328','bluabitch','2023-02-19',NULL);
+INSERT INTO `users` VALUES (13,982616847,'Иванов Иван Иванович','89280328156','AaakkmmM','2023-02-19 00:00:00',1311,'0'),(14,803270707,'Суета Суета Суета','79999999999','Arrrrrrriva','2023-02-21 00:00:00',0,'0');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-19  0:27:49
+-- Dump completed on 2023-02-22 19:10:01
