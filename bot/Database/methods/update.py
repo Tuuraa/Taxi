@@ -35,3 +35,19 @@ async def change_region(user_id, republic):
         )
 
         await connection.commit()
+
+
+async def add_coefficient(coefficient, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set coefficient = coefficient + %s where user_id = %s',
+            (coefficient, user_id)
+        )
+
+        await connection.commit()
+
+
+async def remove_balance(balance, user_id):
+    connection, cursor = await async_connect_to_my_sql()

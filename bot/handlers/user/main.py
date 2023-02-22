@@ -23,6 +23,9 @@ from ...states import UserLocationFSM
 from ...states import ChangeRepublicFSM
 
 
+lock = Lock()
+
+
 async def star_login(message: Message, state: FSMContext):
 
     await state.reset_state(with_data=True)
@@ -199,10 +202,11 @@ async def del_order_location(message: Message, state: FSMContext):
         distance = round(distance_btw_two_points(
             current_point=first_loc,
             order_point=second_loc
-        ).m, 3)
+        ).km, 3)
 
         proxy['distance'] = distance
         proxy['amount'] = distance * 0.6
+        proxy['republic'] = republic
 
         await message.answer(
             f'Расстояние состовляет: {distance} м.\n'
@@ -211,41 +215,67 @@ async def del_order_location(message: Message, state: FSMContext):
             reply_markup=inline.pay_order()
         )
 
-        await db_create.create_delivery(
-             message.from_user.id,
-             proxy["current_location"][0],
-             location[0],
-             distance,
-             distance * 1.5,
-             republic,
-             datetime.now()
-         )
+        # await db_create.create_delivery(
+        #      message.from_user.id,
+        #      proxy["current_location"][0],
+        #      location[0],
+        #      distance,
+        #      distance * 1.5,
+        #      republic,
+        #      datetime.now()
+        #  )
 
-        await state.reset_state(with_data=True)
+        #await state.reset_state(with_data=True)
 
 
 async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
     async with state.proxy() as proxy:
         proxy['type_pay'] = 'cash'
 
-        user_amount = await db_select.balance_by_user(callback.from_user.id)
+        # user_amount = await db_select.balance_by_user(callback.from_user.id)
 
-        if user_amount < int(proxy['amount']):
-            await bot.send_message(
-                callback.from_user.id,
-                'Недостаточно средств для заказа такси. Необходимо пополнить баланс, либо выбрать другой тип оплаты',
-                reply_markup=inline.profile_passenger_btn()
-            )
-            return
+        #await db_update.add_coefficient(0.5, callback.from_user.id)
 
-        # Прописать снятие денег TODO
+        await db_create.create_order(
+             callback.from_user.id,
+             proxy["current_location"][0],
+             proxy["order_location"][0],
+             proxy['distance'],
+             proxy['amount'],
+             proxy['republic'],
+             datetime.now(),
+             'cash'
+         )
 
-        # Продумать эту блядскую систему TODO
+        await state.reset_state(with_data=True)
 
 
 async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
-    async with state.proxy() as proxy:
-        proxy['type_pay'] = 'wallet'
+    async with lock:
+        async with state.proxy() as proxy:
+
+            user_balance = await db_select.balance_by_user(callback.from_user.id)
+
+            if user_balance < int(proxy['amount']):
+                await bot.send_message(
+                    callback.from_user.id,
+                    'Недостаточно средств для заказа такси. Необходимо пополнить баланс, либо выбрать другой тип оплаты',
+                    reply_markup=inline.not_enough_amount()
+                )
+                return
+
+            await db_create.create_order(
+                callback.from_user.id,
+                proxy["current_location"][0],
+                proxy["order_location"][0],
+                proxy['distance'],
+                proxy['amount'],
+                proxy['republic'],
+                datetime.now(),
+                'wallet'
+            )
+
+            await state.reset_state(with_data=True)
 
 
 async def order_del(message: Message):
@@ -296,9 +326,10 @@ async def active_orders(message: Message):
             f'Заказ №{order[0]}\n\n'
             f'Откуда: {order[1]}\n\n'
             f'Куда: {order[2]}\n\n'
-            f'Дистанция: {order[3]} м.\n'
+            f'Дистанция: {order[3]} км.\n'
             f'Оплата: {order[4]} руб.\n'
-            f'Дата создания заявки: {order[8]}',
+            f'Дата создания заявки: {order[8]}\n'
+            f'Тип оплаты: {order[9]}',
             reply_markup=inline.responde_order(order)
         )
 
@@ -333,11 +364,26 @@ async def responde(callback: CallbackQuery):
         'Данные о заказе:\n\n'
         f'Откуда: {order_data_by_db[1]}\n\n'
         f'Куда: {order_data_by_db[2]}\n\n'
+        f'К оплате: {order_data_by_db[4]}\n'
         f'Телефон пассажира: <b>{user_data[3]}</b>\n'
         f'Ссылка: @{user_data[4]}\n',
-        reply_markup=inline.cancel_order(),
+        reply_markup=inline.apply_order(user_data[1], order_user_data[1], order_data_by_db[0]),
         parse_mode='html'
     )
+
+
+async def apply_order(callback: CallbackQuery):
+
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    order_data = [int(item) for item in callback.data.split(':')[1:]]
+
+    await db_update.change_status_to_order(order_data[1], 'COMPLETED')
+
+
 
 
 async def change_republics(callback: CallbackQuery):
@@ -390,6 +436,7 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(pay_by_cash, text='pay_by_cash', state=UserLocationFSM.type_pay)
     dp.register_callback_query_handler(pay_by_wallet, text='pay_by_wallet', state=UserLocationFSM.type_pay)
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
+    dp.register_callback_query_handler(apply_order, inline.cb_apply.filter(data='apply_order'))
     register_login_handlers(dp)
     registration_withdrow_handlers(dp)
     register_refill_handlers(dp)

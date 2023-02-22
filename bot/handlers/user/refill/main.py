@@ -22,7 +22,10 @@ import bot.keyboards.reply as reply
 lock = Lock()
 
 
-async def top_up(callback: CallbackQuery):
+async def top_up(callback: CallbackQuery, state: FSMContext):
+
+    await state.reset_state(with_data=True)
+
     await bot.delete_message(
         callback.from_user.id,
         callback.message.message_id
@@ -68,26 +71,26 @@ async def pre_checkout_query(pre_checkout_q: PreCheckoutQuery):
 
 
 async def successful_payment(message: Message):
-    date = datetime.now()
     async with lock:
+        total_amount = message.successful_payment.total_amount / 100
         await bot.send_message(message.chat.id,
             f"Платеж на сумму "
-            f"{message.successful_payment.total_amount / 100} "
+            f"{total_amount} "
             f"{message.successful_payment.currency} прошел успешно!!!"
         )
         await db_update.add_top_up(
             message.from_user.id,
-            message.successful_payment.total_amount / 100
+            total_amount
         )
         await db_create.create_refill(
             message.from_user.id,
-            message.successful_payment.total_amount,
-            date
+            total_amount,
+            datetime.now()
         )
 
 
 def register_refill_handlers(dp: Dispatcher):
-    dp.register_callback_query_handler(top_up, text='top_up')
+    dp.register_callback_query_handler(top_up, text='top_up', state='*')
     dp.register_message_handler(create_top_up, state=TopUpFSM.amount)
     dp.register_pre_checkout_query_handler(pre_checkout_query, lambda query: True)
     dp.register_message_handler(successful_payment, content_types=ContentType.SUCCESSFUL_PAYMENT)

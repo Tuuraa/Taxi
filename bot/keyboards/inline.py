@@ -5,6 +5,7 @@ import bot.Database.methods.get as db_select
 
 
 cb_data = CallbackData('ibk', 'user_id', 'id_order', 'data')
+cb_apply = CallbackData('ibk', 'user_id', 'driver_id', 'order_id', 'data')
 
 
 def check_status_btns():
@@ -59,9 +60,17 @@ def responde_order(order):
     )
 
 
-def cancel_order():
+def apply_order(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
-        InlineKeyboardButton('❌ Отменить заказ', callback_data='test')
+        InlineKeyboardButton(
+            'Подтвердить оплату',
+            callback_data=cb_apply.new(
+                user_id=user_id,
+                order_id=order_id,
+                driver_id=driver_id,
+                data='apply_order'
+            )
+        )
     )
 
 
@@ -70,4 +79,11 @@ def pay_order():
         InlineKeyboardButton('Заплатить наличными', callback_data='pay_by_cash')
     ).add(
         InlineKeyboardButton('Снять с баланса бота', callback_data='pay_by_wallet')
+    )
+
+
+def not_enough_amount():
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton('Заплатить наличными', callback_data='pay_by_cash'),
+        InlineKeyboardButton('💸 Пополнить', callback_data='top_up')
     )
