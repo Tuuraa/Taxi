@@ -20,6 +20,7 @@ class UserLocationFSM(StatesGroup):
     agreed_location = State()
     disagree_location = State()
     distance = State()
+    time = State()
     amount = State()
     republic = State()
     type_pay = State()

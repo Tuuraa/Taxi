@@ -127,12 +127,15 @@ async def order_location(message: Message, state: FSMContext):
             order_point=second_loc
         ).m, 3)
 
+
         proxy['distance'] = distance
-        proxy['amount'] = distance * 0.6
+        proxy['time'] = distance / 50
+        proxy['amount'] = 75 + 10 * (distance - 1) + 5 * (distance / 50 - 5)
 
         await message.answer(
             f'Расстояние состовляет: {distance} м.\n'
-            f'Сумма к оплате {distance * 0.6}\n'
+            f'Время пути составит:{distance / 50} мин.\n'
+            f'Сумма к оплате {75 + 10 * (distance - 1) + 5 * (distance / 50 - 5)}\n'
             f'Выберите каким образом будете оплачивать',
             reply_markup=inline.pay_order()
         )
@@ -157,7 +160,7 @@ async def current_del_location_handler(message: Message, state: FSMContext):
         proxy['current_location'] = location[0], location[1], location[2]
 
     await message.answer(
-        "А теперь куда хотите доставить.\n"
+        "А теперь куда хотите поехать.\n"
         "Для этого нажмите на скрепку 📎, и оправьте локацию, куда хотите поехать",
         reply_markup=reply.order_location()
     )
@@ -202,18 +205,20 @@ async def del_order_location(message: Message, state: FSMContext):
         distance = round(distance_btw_two_points(
             current_point=first_loc,
             order_point=second_loc
-        ).km, 3)
+        ).m, 3)
 
         proxy['distance'] = distance
-        proxy['amount'] = distance * 0.6
-        proxy['republic'] = republic
+        proxy['time'] = distance / 50
+        proxy['amount'] = 75 + 10 * (distance - 1) + 5 * (distance / 50 - 5)
 
         await message.answer(
             f'Расстояние состовляет: {distance} м.\n'
-            f'Сумма к оплате {distance * 0.6}\n'
+            f'Время пути составит:{distance / 50} мин.\n'
+            f'Сумма к оплате {75 + 10 * (distance - 1) + 5 * (distance / 50 - 5)}\n'
             f'Выберите каким образом будете оплачивать',
             reply_markup=inline.pay_order()
         )
+
 
         # await db_create.create_delivery(
         #      message.from_user.id,
