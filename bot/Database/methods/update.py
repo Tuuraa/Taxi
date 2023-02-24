@@ -42,13 +42,31 @@ async def add_coefficient(coefficient, user_id):
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            'update users set balance = balance + ',
+            'update drivers set coefficient = coefficient + %s where user_id = %s',
             (coefficient, user_id)
         )
 
         await connection.commit()
 
 
-async def update_balance(balance, user_id):
+async def remove_balance_from_user(balance, user_id):
     connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update users set balance = balance - %s where user_id = %s', (balance, user_id)
+        )
+
+        await connection.commit()
+
+
+async def add_balance_from_driver(balance, driver_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set balance = balance + %s where user_id = %s', (balance, driver_id)
+        )
+
+        await connection.commit()
 
