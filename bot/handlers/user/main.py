@@ -214,7 +214,7 @@ async def delivery_order_location(message: Message, state: FSMContext):
             reply_markup=inline.pay_delivery()
         )
 
-        await UserLocationFSM.type_pay.set()
+        await UserLocationFSM.delivery_type_pay.set()
 
 
 async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
@@ -286,7 +286,7 @@ async def del_pay_by_wallet(callback: CallbackQuery, state: FSMContext):
         async with state.proxy() as proxy:
             user_balance = await db_select.balance_by_user(callback.from_user.id)
 
-            if user_balance < int(proxy['amount']):
+            if user_balance < int(proxy['delivery_amount']):
                 await bot.send_message(
                     callback.from_user.id,
                     'Недостаточно средств для заказа такси. Необходимо пополнить баланс, либо выбрать другой тип оплаты',
@@ -361,6 +361,7 @@ async def order_delivery(message:Message):
     )
 
     await UserLocationFSM.current_delivery_location.set()
+
 
 async def order_taxi(message: Message):
     await message.answer(

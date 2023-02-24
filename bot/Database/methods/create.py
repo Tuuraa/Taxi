@@ -40,13 +40,14 @@ async def create_order(user_id, user_location, order_location, distance, amount,
         await connection.commit()
 
 
-async def create_delivery(user_id, delivery_location, delivery_order_location, delivery_distance, delivery_amount, republic, date, delivery_type_pay):
+async def create_delivery(user_id, current_delivery_location, delivery_order_location, delivery_distance, delivery_amount, republic, date, delivery_type_pay):
     connection, cursor = await async_connect_to_my_sql()
+
     async with connection.cursor() as cursor:
         await cursor.execute(
-            'insert into delivery (user_id, user_location, order_location, distance, amount, republic, date, type_pay) '
-            'values (%s, %s, %s, %s, %s, %s, %s, %s)',
-            (user_id, delivery_location, delivery_order_location, delivery_distance, delivery_amount, republic, date, delivery_type_pay)
+            'insert into delivery (user_id, delivery_location, delivery_order_location, delivery_distance, delivery_amount, republic, date, delivery_type_pay)'
+             'values (%s, %s, %s, %s, %s, %s, %s, %s)',
+            (user_id, current_delivery_location, delivery_order_location, delivery_distance, delivery_amount, 'WAITING', republic, date, delivery_type_pay)
         )
 
         await connection.commit()
