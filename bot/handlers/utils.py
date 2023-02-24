@@ -13,6 +13,7 @@ def current_user_location(location):
     return nomin.reverse(f'{latitude} {longitude}'), latitude, longitude
 
 
+
 def distance_btw_two_points(current_point, order_point):
     distance = geodesic(current_point, order_point)
 

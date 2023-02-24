@@ -145,6 +145,78 @@ async def order_location(message: Message, state: FSMContext):
         await UserLocationFSM.type_pay.set()
 
 
+async def current_delivery_location(message: Message, state: FSMContext):
+    location = current_user_location(message)
+
+    async with state.proxy() as proxy:
+        proxy['current_delivery_location'] = location[0], location[1], location[2]
+
+    await message.answer(
+        "А теперь куда хотите заказать доставку.\n"
+        "Для этого нажмите на скрепку 📎, и оправьте локацию, куда хотите поехать",
+        reply_markup=reply.order_location()
+    )
+
+    await UserLocationFSM.next()
+
+
+async def delivery_order_location(message: Message, state: FSMContext):
+    location = current_user_location(message)
+
+    async with state.proxy() as proxy:
+        proxy['delivery_order_location'] = location[0], location[1], location[2]
+
+        location_list = proxy['current_delivery_location'][0].address.split(', ')
+        republic = ''
+        user_data = await db_select.type_user(message.from_user.id)
+
+        for loc in location_list:
+            if loc in republics:
+                republic = loc
+                break
+
+        if not republic:
+            await message.answer(
+                'В данном регионе этот сервис не работает!!',
+                reply_markup=reply.profile_passenger_markup() if user_data == 'passenger' else reply.profile_driver_markup()
+            )
+            await state.reset_state(with_data=True)
+            return
+
+        await message.answer(
+            f'Откуда:\n{proxy["current_delivery_location"][0]}'
+        )
+
+        await message.answer(
+            f'Куда:\n{location[0]}'
+        )
+
+        first_loc = proxy['current_delivery_location'][1], proxy['current_delivery_location'][2]
+        second_loc = proxy['delivery_order_location'][1], proxy['delivery_order_location'][2]
+
+        distance = round(distance_btw_two_points(
+            current_point=first_loc,
+            order_point=second_loc
+        ).km, 3)
+
+        amount = 75 + 10 * (distance - 1) + 5 * (1 + distance / 50 - 5)
+
+        proxy['delivery_distance'] = distance
+        proxy['delivery_time'] = distance / 50
+        proxy['delivery_amount'] = amount
+        proxy['republic'] = republic
+
+        await message.answer(
+            f'Расстояние состовляет: {distance} м.\n'
+            f'Время пути составит:{distance / 50} мин.\n'
+            f'Сумма к оплате {amount}\n'
+            f'Выберите каким образом будете оплачивать',
+            reply_markup=inline.pay_delivery()
+        )
+
+        await UserLocationFSM.type_pay.set()
+
+
 async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
 
     await bot.delete_message(
@@ -173,6 +245,73 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
         )
 
         await state.reset_state(with_data=True)
+
+
+async def del_pay_by_cash(callback: CallbackQuery, state: FSMContext):
+
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    async with state.proxy() as proxy:
+        proxy['delivery_type_pay'] = 'cash'
+
+        await db_create.create_delivery(
+            callback.from_user.id,
+            proxy['current_delivery_location'][0],
+            proxy['delivery_order_location'][0],
+            proxy['delivery_distance'],
+            proxy['delivery_amount'],
+            proxy['republic'],
+            datetime.now(),
+            'cash'
+        )
+
+        await bot.send_message(
+            callback.from_user.id,
+            'Заказ успешно создан',
+            reply_markup=reply.profile_passenger_markup()
+        )
+        await state.reset_state(with_data=True)
+
+
+async def del_pay_by_wallet(callback: CallbackQuery, state: FSMContext):
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    async with lock:
+        async with state.proxy() as proxy:
+            user_balance = await db_select.balance_by_user(callback.from_user.id)
+
+            if user_balance < int(proxy['amount']):
+                await bot.send_message(
+                    callback.from_user.id,
+                    'Недостаточно средств для заказа такси. Необходимо пополнить баланс, либо выбрать другой тип оплаты',
+                    reply_markup=inline.not_enough_amount()
+                )
+                return
+
+            await db_create.create_delivery(
+                callback.from_user.id,
+                proxy['current_delivery_location'][0],
+                proxy['delivery_order_location'][0],
+                proxy['delivery_distance'],
+                proxy['delivery_amount'],
+                proxy['republic'],
+                datetime.now(),
+                'wallet'
+            )
+
+            await bot.send_message(
+                callback.from_user.id,
+                'Заказ успешно создан.',
+                reply_markup=reply.profile_passenger_markup()
+            )
+
+            await state.reset_state(with_data=True)
 
 
 async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
@@ -214,6 +353,14 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
 
             await state.reset_state(with_data=True)
 
+
+async def order_delivery(message:Message):
+    await message.answer(
+        'Отправьте локацию, либо пропишите ее вручную',
+        reply_markup=reply.set_current_locale()
+    )
+
+    await UserLocationFSM.current_delivery_location.set()
 
 async def order_taxi(message: Message):
     await message.answer(
@@ -375,11 +522,18 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(new_republic, state=ChangeRepublicFSM.republic)
     dp.register_message_handler(current_user_location_handler, state=UserLocationFSM.current_location,
                                 content_types=['location', 'text'])
+    dp.register_message_handler(current_delivery_location, state=UserLocationFSM.current_delivery_location,
+                                content_types=['location', 'text'])
+    dp.register_message_handler(delivery_order_location, state=UserLocationFSM.delivery_order_location,
+                                content_types=['location', 'text'])
     dp.register_message_handler(order_location, state=UserLocationFSM.order_location,
                                 content_types=['location', 'text'])
+    dp.register_message_handler(order_delivery, lambda mes: mes.text == 'Заказать доставку')
     dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси')
     dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы')
     dp.register_message_handler(support, lambda mes: mes.text == '⚙️ Техническая поддержка')
+    dp.register_callback_query_handler(del_pay_by_cash, text='del_pay_by_cash', state=UserLocationFSM.delivery_type_pay)
+    dp.register_callback_query_handler(del_pay_by_wallet, text='del_pay_by_wallet', state=UserLocationFSM.delivery_type_pay)
     dp.register_callback_query_handler(pay_by_cash, text='pay_by_cash', state=UserLocationFSM.type_pay)
     dp.register_callback_query_handler(pay_by_wallet, text='pay_by_wallet', state=UserLocationFSM.type_pay)
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))

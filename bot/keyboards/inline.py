@@ -82,6 +82,14 @@ def pay_order():
     )
 
 
+def pay_delivery():
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton('Заплатить наличными', callback_data='del_pay_cash')
+    ).add(
+        InlineKeyboardButton('Снять с баланса', callback_data='del_pay_by_wallet')
+    )
+
+
 def not_enough_amount():
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton('Заплатить наличными', callback_data='pay_by_cash'),
