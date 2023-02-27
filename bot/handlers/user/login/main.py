@@ -6,8 +6,6 @@ from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from datetime import datetime
 
 import bot.Database.methods.create as db_create
-import bot.Database.methods.get as db_select
-import bot.keyboards.inline as inline
 import bot.keyboards.reply as reply
 
 from bot.env import *
@@ -156,6 +154,7 @@ async def phone_pass(message: Message, state: FSMContext):
         return
 
     async with state.proxy() as proxy:
+
         await db_create.create_new_user(
             message.from_user.id,
             str(proxy['full_name']).title(),
