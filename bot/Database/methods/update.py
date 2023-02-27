@@ -37,6 +37,18 @@ async def change_region(user_id, republic):
         await connection.commit()
 
 
+async def change_complete_order(date, id_order):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update orders set compete_date = %s where id = %s',
+            (date, id_order)
+        )
+
+        await connection.commit()
+
+
 async def add_coefficient(coefficient, user_id):
     connection, cursor = await async_connect_to_my_sql()
 
