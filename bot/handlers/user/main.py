@@ -304,8 +304,8 @@ async def del_pay_by_wallet(callback: CallbackQuery, state: FSMContext):
 
             await db_create.create_delivery(
                 callback.from_user.id,
-                proxy['current_delivery_location'][0],
-                proxy['delivery_order_location'][0],
+                proxy["current_delivery_location"][0],
+                proxy["delivery_order_location"][0],
                 proxy['delivery_distance'],
                 proxy['delivery_amount'],
                 proxy['republic'],
