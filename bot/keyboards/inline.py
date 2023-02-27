@@ -63,7 +63,7 @@ def responde_order(order):
 def apply_order(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
-            'Подтвердить оплату',
+            'Подтвердить выполнение заказа',
             callback_data=cb_apply.new(
                 user_id=user_id,
                 order_id=order_id,
