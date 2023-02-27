@@ -50,11 +50,13 @@ async def profile(message: Message, state: FSMContext):
     user_data = (await db_select.profile_data(message.from_user.id))
 
     if user_data[0] == 'pass':
+
         await message.answer(
             f'🤖 Ваш ID: <b>{user_data[1][0]}</b>\n'
             f'👤 ФИО: <b>{user_data[1][1]}\n</b>'
             f'📱 Телефон: <b>{user_data[1][2]}</b>\n'
-            f'💰 Баланс: <b>{user_data[1][3]}</b> руб.\n',
+            f'💰 Баланс: <b>{user_data[1][3]}</b> руб'
+            f'<a href=\"https://i.ibb.co/9sfJy3J/image.png\">.</a>',
             parse_mode='html',
             reply_markup=inline.profile_passenger_btn()
         )
@@ -79,8 +81,10 @@ async def current_user_location_handler(message: Message, state: FSMContext):
         proxy['current_location'] = location[0], location[1], location[2]
 
     await message.answer(
-        "А теперь куда хотите поехать.\n"
-        "Для этого нажмите на скрепку 📎, и оправьте локацию, куда хотите поехать",
+        "А теперь куда хотите заказать такси.\n"
+        "Для этого нажмите на скрепку 📎, и оправьте локацию, куда хотите поехать\n\n"
+        "<b><i>Обратите внимание, адрес должен быть точно указан.</i></b>",
+        parse_mode='html',
         reply_markup=reply.order_location()
     )
 
@@ -129,13 +133,21 @@ async def order_location(message: Message, state: FSMContext):
 
         if distance < 2:
             amount = 75
-        else:
+        elif 50 >= distance > 2:
             distance = int(distance)
             coef = ways[distance]
             if distance < 4:
-                amount = 75 + coef * (distance - 1) + 5 * (3 + distance / 50 - 5)
+                amount = 75 + coef * (distance - 1) + 5 * (3 + ((distance / 50) * 60) - 5)
             else:
-                amount = 75 + coef * (distance - 1) + 5 * (1 + distance / 50 - 5)
+                amount = 75 + coef * (distance - 1) + 5 * (1 + ((distance / 50) * 60) - 5)
+        else:
+            distance = int(distance)
+            coef = ways[len(ways)]
+            amount = 75 + coef * (distance - 1) + 5 * (1 + distance / 50 - 5)
+            other_sum = int((distance - len(ways)) / 3) * 82
+            amount += other_sum
+
+        amount = round(amount, 2)
 
         proxy['distance'] = distance
         proxy['time'] = distance / 50
@@ -161,7 +173,8 @@ async def current_delivery_location(message: Message, state: FSMContext):
 
     await message.answer(
         "А теперь куда хотите заказать доставку.\n"
-        "Для этого нажмите на скрепку 📎, и оправьте локацию, куда хотите поехать",
+        "Для этого нажмите на скрепку 📎, и оправьте локацию, куда хотите поехать\n\n"
+        "<b><i>Обратите внимание, адрес должен быть точно указан.</i></b>",
         reply_markup=reply.order_location()
     )
 
@@ -210,7 +223,7 @@ async def delivery_order_location(message: Message, state: FSMContext):
         amount = 75 + 10 * (distance - 1) + 5 * (1 + distance / 50 - 5)
 
         proxy['delivery_distance'] = distance
-        proxy['delivery_time'] = distance / 50
+        proxy['delivery_time'] = round(distance / 50, 2)
         proxy['delivery_amount'] = amount
         proxy['republic'] = republic
 
@@ -243,7 +256,8 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
              proxy['amount'],
              proxy['republic'],
              datetime.now(),
-             'cash'
+             'cash',
+             proxy['time']
          )
 
         await bot.send_message(
@@ -350,7 +364,8 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
                 proxy['amount'],
                 proxy['republic'],
                 datetime.now(),
-                'wallet'
+                'wallet',
+                proxy['time']
             )
 
             await bot.send_message(
@@ -373,7 +388,7 @@ async def order_delivery(message: Message):
 
 async def order_taxi(message: Message):
     await message.answer(
-        'Отправьте локацию, либо пропишите ее вручную',
+        'Отправьте локацию.',
         reply_markup=reply.set_current_locale()
     )
 
@@ -451,7 +466,9 @@ async def responde(callback: CallbackQuery):
         f'Куда: {order_data_by_db[2]}\n\n'
         f'К оплате: {order_data_by_db[4]}\n'
         f'Телефон пассажира: <b>{user_data[3]}</b>\n'
-        f'Ссылка: @{user_data[4]}\n',
+        f'Ссылка: @{user_data[4]}\n\n'
+        f'<b>После нажатия на кнопку деньги будут списаны с счета заказчика. <i>Не нажимайте кнопку, если вы еще '
+        f'не выполнили заказ, в случай ошибки обратитесь в тех. поддержку</i></b>',
         reply_markup=inline.apply_order(user_data[1], order_user_data[1], order_data_by_db[0]),
         parse_mode='html'
     )
@@ -465,8 +482,8 @@ async def apply_order(callback: CallbackQuery):
     )
 
     order_data = [int(item) for item in callback.data.split(':')[1:-1]]
-
     await db_update.change_status_to_order('COMPLETED', order_data[1])
+    await db_update.change_complete_order(datetime.now(), order_data[1])
     balance = await db_select.information_by_order(order_data[1])
 
     if balance[9] == 'wallet':
@@ -475,22 +492,22 @@ async def apply_order(callback: CallbackQuery):
 
         await bot.send_message(
             callback.from_user.id,
-            f'Вы успешно подтвердили выполнение заказа. Ваш баланс пополнен на {balance[4]} р.'
+            f'Вы успешно подтвердили выполнение заказа №{order_data[1]}. Ваш баланс пополнен на {balance[4]} р.'
         )
 
         await bot.send_message(
-            order_data[2],
-            f'Заказ  был подтвержден. С вашего баланса было снято {balance[4]} р.\n'
+            order_data[0],
+            f'Заказ №{order_data[1]} был подтвержден водителем. С вашего баланса было снято {balance[4]} р.\n'
             f'В случай ошибки напишите в тех. поддержку.'
         )
     else:
         await bot.send_message(
             callback.from_user.id,
-            'Заказ успешно подтвержден.'
+            f'Заказ №{order_data[1]} успешно подтвержден.'
         )
 
         await bot.send_message(
-            order_data[2],
+            order_data[0],
             f'Водитель успешно подтвердил выполнение заказа №{order_data[1]}'
         )
 
