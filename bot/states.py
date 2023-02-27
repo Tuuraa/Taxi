@@ -16,19 +16,23 @@ class PassengerFSM(StatesGroup):
 
 class UserLocationFSM(StatesGroup):
     current_location = State()
-    current_delivery_location = State()
-    delivery_order_location = State()
     order_location = State()
     agreed_location = State()
     disagree_location = State()
-    delivery_distance = State()
     distance = State()
-    time = State()
-    delivery_time = State()
-    delivery_amount = State()
-    amount = State()
     republic = State()
     type_pay = State()
+    time = State()
+    amount = State()
+
+
+class DeliveryFSM(StatesGroup):
+    current_delivery_location = State()
+    delivery_order_location = State()
+    delivery_time = State()
+    delivery_amount = State()
+    delivery_distance = State()
+    republic = State()
     delivery_type_pay = State()
 
 
