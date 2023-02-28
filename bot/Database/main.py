@@ -3,14 +3,14 @@ from pymysql import connect
 import asyncio
 import os
 
-user = os.path.abspath(__file__).split('\\')[2]
+#user = os.path.abspath(__file__).split('\\')[2]
 
 
 class DBParameters:
     def __init__(self):
         self.Host = "localhost"
         self.Users = "root"
-        self.Password = '4789' if user == 'пк' else '5377'
+        self.Password = '5377'#4789' if user == 'пк' else '5377'
         self.DB_NAME = "taxi"
         self.loop = asyncio.new_event_loop()
 
