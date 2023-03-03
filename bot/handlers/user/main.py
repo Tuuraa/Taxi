@@ -84,6 +84,22 @@ async def profile(message: Message, state: FSMContext):
         )
 
 
+async def number_of_passengers(message: Message):
+    await message.answer(
+        "Какое количество пассажиров поедет.\n"
+        "Обратите внимание количество пассажиров должно быть точно указано"
+    )
+    if message.text.isdigit():
+        await message.answer("Вы ввели не число!")
+        return
+
+    if message.text > 30:
+        await message.answer(
+            "Слишком большое количество пассажиров"
+        )
+
+
+
 async def current_user_location_handler(message: Message, state: FSMContext):
     location = current_user_location(message)
 
