@@ -44,8 +44,8 @@ async def create_top_up(message: Message, state: FSMContext):
 
     price = LabeledPrice(label="Пополнение", amount=amount * 100)
 
-    if payment_token.split(':')[1] == 'TEST':
-        await bot.send_message(message.chat.id, "Тестовый платеж!!!")
+    # if payment_token.split(':')[1] == 'TEST':
+    #     await bot.send_message(message.chat.id, "Тестовый платеж!!!")
 
     await bot.send_invoice(
         message.chat.id,

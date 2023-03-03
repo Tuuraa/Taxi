@@ -10,6 +10,8 @@ republics = [
     'Карачаево-Черкесия', 'Кавказские Минеральные Воды'
 ]
 
+admins = [855151774]
+
 admin_link = '@bluabitch, @AaakkmmM'
 
 time_coef = 3

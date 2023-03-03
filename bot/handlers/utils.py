@@ -3,6 +3,13 @@ from geopy.distance import geodesic
 from json import loads
 
 
+changed_data = {
+    'ФИО': 'full_name',
+    'Телефон': 'number',
+    'Баланс': 'balance'
+}
+
+
 def current_user_location(location):
     loc_data = loads(str(location.as_json()))['location']
     latitude = loc_data.get('latitude')

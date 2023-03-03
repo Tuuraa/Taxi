@@ -122,7 +122,7 @@ async def passenger(callback: CallbackQuery):
 
     await bot.send_message(
         callback.from_user.id,
-        'Напишите ваше полное имя:\n'
+        'Напишите ваше ФИО:\n'
         'Пример: Иванов Иван Иванович'
     )
 

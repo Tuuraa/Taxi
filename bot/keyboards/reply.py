@@ -42,3 +42,25 @@ def all_republics():
         reply.add(republic)
 
     return reply
+
+
+def admin_panel_btns():
+    return ReplyKeyboardMarkup(resize_keyboard=True).add(
+        'Искать пользователя', 'Искать водителя'
+    ).add(
+        'Что-то еще'
+    )
+
+
+def change_user_list():
+    return ReplyKeyboardMarkup(resize_keyboard=True).add(
+        'ФИО', 'Телефон', 'Баланс'
+    )
+
+
+def change_driver_list():
+    return ReplyKeyboardMarkup(resize_keyboard=True).add(
+        'ФИО', 'Телефон', 'Баланс', 'Марка машины', 'Номер машины',
+        'Республика'
+    )
+

@@ -142,8 +142,7 @@ async def information_by_order(id):
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            "select * from orders where id = %s",
-            id
+            "select * from orders where id = %s", id
         )
 
         result = await cursor.fetchone()

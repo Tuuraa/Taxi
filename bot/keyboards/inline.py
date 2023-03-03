@@ -6,6 +6,7 @@ import bot.Database.methods.get as db_select
 
 cb_data = CallbackData('ibk', 'user_id', 'id_order', 'data')
 cb_apply = CallbackData('ibk', 'user_id', 'driver_id', 'order_id', 'data')
+change_pass = CallbackData('ibk', 'user_id', 'data')
 
 
 def check_status_btns():
@@ -69,6 +70,18 @@ def apply_order(user_id, order_id, driver_id):
                 order_id=order_id,
                 driver_id=driver_id,
                 data='apply_order'
+            )
+        )
+    )
+
+
+def change_user(user_id):
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton(
+            'Изменить',
+            callback_data=change_pass.new(
+                user_id=user_id,
+                data='change_user'
             )
         )
     )

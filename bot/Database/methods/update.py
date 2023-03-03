@@ -82,3 +82,101 @@ async def add_balance_from_driver(balance, driver_id):
 
         await connection.commit()
 
+
+async def update_name_from_user(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update users set full_name = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()
+
+
+async def update_phone_from_user(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update users set number = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()
+
+
+async def update_balance_from_user(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update users set balance = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()
+
+
+async def update_name_from_driver(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set full_name = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()
+
+
+async def update_phone_from_driver(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set number = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()
+
+
+async def update_balance_from_driver(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set balance = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()
+
+
+async def update_mark_from_driver(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set car = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()
+
+
+async def update_car_number_from_driver(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set car_number = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()
+
+
+async def update_republic_from_driver(value, user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set republic = %s where user_id = %s', (value, user_id)
+        )
+
+        await connection.commit()

@@ -2,7 +2,7 @@ from asyncio import Lock
 from datetime import datetime
 
 from aiogram import Dispatcher
-from aiogram.types import Message, CallbackQuery, Location, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
 
 import bot.Database.methods.create as db_create
@@ -29,7 +29,13 @@ async def star_login(message: Message, state: FSMContext):
 
     await state.reset_state(with_data=True)
 
-    if await db_select.exists_passenger(message.from_user.id) or await db_select.exists_driver(message.from_user.id):
+    if message.from_user.id in admins:
+        await message.answer(
+            'Добро пожаловать',
+            reply_markup=reply.admin_panel_btns()
+        )
+
+    elif await db_select.exists_passenger(message.from_user.id) or await db_select.exists_driver(message.from_user.id):
 
         user_data = await db_select.type_user(message.from_user.id)
         await message.answer(
@@ -39,7 +45,10 @@ async def star_login(message: Message, state: FSMContext):
 
     else:
         await message.answer(
-            '<b>Taxi bot</b> это крупный бла бла бал,выберите вы пассажир или пользователь',
+            f'<b>Transfer</b> такси-бот в телеграмме направленный '
+            f'на то, чтобы вы быстро, удобно, а главное дешево доехали в нужное вам место.\n'
+            f'<b>Transfer</b> выгоден не только для пользователей, но и для водителей, из-за отсутствия '
+            f'какого либо налога на них.',
             reply_markup=inline.check_status_btns(),
             parse_mode='html'
         )
@@ -68,7 +77,8 @@ async def profile(message: Message, state: FSMContext):
             f'🚗 Марка машины: <b>{user_data[1][3]}</b>\n'
             f'🚕 Номер машины: <b>{user_data[1][4]}</b>\n'
             f'⛰️ Республика: <b>{user_data[1][5]}</b>\n'
-            f'💵 Баланс: <b>{user_data[1][6]}</b> руб.\n',
+            f'💵 Баланс: <b>{user_data[1][6]}</b> руб\n'
+            f'<a href=\"https://i.ibb.co/9sfJy3J/image.png\">.</a>',
             parse_mode='html',
             reply_markup=inline.profile_driver_btn()
         )
@@ -377,7 +387,10 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
             await state.reset_state(with_data=True)
 
 
-async def order_delivery(message: Message):
+async def order_delivery(message: Message, state: FSMContext):
+
+    await state.reset_state(with_data=True)
+
     await message.answer(
         'Отправьте локацию, либо пропишите ее вручную',
         reply_markup=reply.set_current_locale()
@@ -386,7 +399,10 @@ async def order_delivery(message: Message):
     await DeliveryFSM.current_delivery_location.set()
 
 
-async def order_taxi(message: Message):
+async def order_taxi(message: Message, state: FSMContext):
+
+    await state.reset_state(with_data=True)
+
     await message.answer(
         'Отправьте локацию.',
         reply_markup=reply.set_current_locale()
@@ -404,14 +420,20 @@ async def back(message: Message, state: FSMContext):
     )
 
 
-async def support(message: Message):
+async def support(message: Message, state: FSMContext):
+
+    await state.reset_state(with_data=True)
+
     await message.answer(
         'По любым вопросам пишите @bluabitch\n'
         'Ответит в течении часа!'
     )
 
 
-async def active_orders(message: Message):
+async def active_orders(message: Message, state: FSMContext):
+
+    await state.reset_state(with_data=True)
+
     republic = await db_select.republic_by_driver(message.from_user.id)
 
     orders = await db_select.all_active_orders(republic)
@@ -435,43 +457,43 @@ async def active_orders(message: Message):
 
 
 async def responde(callback: CallbackQuery):
+    async with lock:
+        await bot.delete_message(
+            callback.from_user.id,
+            callback.message.message_id
+        )
 
-    await bot.delete_message(
-        callback.from_user.id,
-        callback.message.message_id
-    )
+        order_data = callback.data.split(':')
 
-    order_data = callback.data.split(':')
+        user_data = await db_select.information_by_user(int(order_data[1]))
+        order_data_by_db = await db_select.information_by_order(int(order_data[2]))
+        order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
-    user_data = await db_select.information_by_user(int(order_data[1]))
-    order_data_by_db = await db_select.information_by_order(int(order_data[2]))
-    order_user_data = await db_select.information_by_driver(callback.from_user.id)
+        await db_update.change_status_to_order('PROCESSING', order_data[2])
 
-    await db_update.change_status_to_order('PROCESSING', order_data[2])
+        await bot.send_message(
+            int(order_data[1]),
+            f'Ваш заказ был принят водителем @{callback.from_user.username}\n\n'
+            f'Данные о нем:\n'
+            f'Телефон: <b>{order_user_data[5]}</b>\n'
+            f'Марка машины: <b>{order_user_data[3]}</b>\n'
+            f'Номер машины: <b>{order_user_data[4]}</b>',
+            parse_mode='html'
+        )
 
-    await bot.send_message(
-        int(order_data[1]),
-        f'Ваш заказ был принят водителем @{callback.from_user.username}\n\n'
-        f'Данные о нем:\n'
-        f'Телефон: <b>{order_user_data[5]}</b>\n'
-        f'Марка машины: <b>{order_user_data[3]}</b>\n'
-        f'Номер машины: <b>{order_user_data[4]}</b>',
-        parse_mode='html'
-    )
-
-    await bot.send_message(
-        callback.from_user.id,
-        'Данные о заказе:\n\n'
-        f'Откуда: {order_data_by_db[1]}\n\n'
-        f'Куда: {order_data_by_db[2]}\n\n'
-        f'К оплате: {order_data_by_db[4]}\n'
-        f'Телефон пассажира: <b>{user_data[3]}</b>\n'
-        f'Ссылка: @{user_data[4]}\n\n'
-        f'<b>После нажатия на кнопку деньги будут списаны с счета заказчика. <i>Не нажимайте кнопку, если вы еще '
-        f'не выполнили заказ, в случай ошибки обратитесь в тех. поддержку</i></b>',
-        reply_markup=inline.apply_order(user_data[1], order_user_data[1], order_data_by_db[0]),
-        parse_mode='html'
-    )
+        await bot.send_message(
+            callback.from_user.id,
+            'Данные о заказе:\n\n'
+            f'Откуда: {order_data_by_db[1]}\n\n'
+            f'Куда: {order_data_by_db[2]}\n\n'
+            f'К оплате: {order_data_by_db[4]}\n'
+            f'Телефон пассажира: <b>{user_data[3]}</b>\n'
+            f'Ссылка: @{user_data[4]}\n\n'
+            f'<b>После нажатия на кнопку деньги будут списаны с счета заказчика. <i>Не нажимайте кнопку, если вы еще '
+            f'не выполнили заказ, в случай ошибки обратитесь в тех. поддержку</i></b>',
+            reply_markup=inline.apply_order(user_data[1], order_user_data[1], order_data_by_db[0]),
+            parse_mode='html'
+        )
 
 
 async def apply_order(callback: CallbackQuery):
@@ -518,6 +540,7 @@ async def change_republics(callback: CallbackQuery):
         callback.message.message_id
     )
     await bot.send_message(
+        callback.from_user.id,
         "Выберите республику:",
         reply_markup=reply.all_republics()
     )
@@ -544,10 +567,10 @@ def register_user_handlers(dp: Dispatcher):
 
     dp.register_message_handler(star_login, commands=['start'], state='*')
     dp.register_message_handler(profile, lambda msg: msg.text == '👤 Профиль', state="*")
-    dp.register_message_handler(order_delivery, lambda mes: mes.text == 'Заказать доставку')
-    dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси')
-    dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы')
-    dp.register_message_handler(support, lambda mes: mes.text == '⚙️ Техническая поддержка')
+    dp.register_message_handler(order_delivery, lambda mes: mes.text == 'Заказать доставку', state="*")
+    dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси', state="*")
+    dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы', state="*")
+    dp.register_message_handler(support, lambda mes: mes.text == '⚙️ Техническая поддержка', state="*")
     dp.register_message_handler(back, lambda mes: mes.text == '⬅️ Вернуться', state='*')
 
     dp.register_callback_query_handler(change_republics, text='change_region')

@@ -48,3 +48,23 @@ class TopUpFSM(StatesGroup):
 
 class ChangeRepublicFSM(StatesGroup):
     republic = State()
+
+
+class SearchPassengerFSM(StatesGroup):
+    name = State()
+
+
+class SearchDriverFSM(StatesGroup):
+    name = State()
+
+
+class ChangeDataUserFSM(StatesGroup):
+    user_id = State()
+    changed = State()
+    data = State()
+
+
+class ChangeDataDriverFSM(StatesGroup):
+    user_id = State()
+    changed = State()
+    data = State()
