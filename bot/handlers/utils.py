@@ -10,6 +10,19 @@ changed_data = {
 }
 
 
+orders_data = {
+    'В ожидании': 'WAITING',
+    'Выполнено': 'COMPLETED',
+    'В процессе': 'PROCESSING'
+}
+
+
+def get_key(value):
+    for k, v in orders_data.items():
+        if v == value:
+            return k
+
+
 def current_user_location(location):
     loc_data = loads(str(location.as_json()))['location']
     latitude = loc_data.get('latitude')
