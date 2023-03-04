@@ -137,6 +137,19 @@ async def information_by_driver(user_id):
         return result
 
 
+async def orders_by_status_and_republic(republic, status):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from orders where status = %s and republic = %s",
+            (status, republic)
+        )
+
+        result = await cursor.fetchall()
+        return result
+
+
 async def information_by_order(id):
     connection, cursor = await async_connect_to_my_sql()
 

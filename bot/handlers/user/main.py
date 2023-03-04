@@ -29,7 +29,7 @@ async def star_login(message: Message, state: FSMContext):
 
     await state.reset_state(with_data=True)
 
-    if message.from_user.id in admins:
+    if await db_select.exists_passenger(message.from_user.id) and message.from_user.id in admins:
         await message.answer(
             'Добро пожаловать',
             reply_markup=reply.admin_panel_btns()
@@ -97,15 +97,14 @@ async def number_of_passengers(message: Message, state: FSMContext):
         return
 
     async with state.proxy() as proxy:
-        proxy['numbers_of_users'] = message.text
+        proxy['numbers_of_users'] = int(message.text)
 
     await message.answer(
         'Поездка осуществляется:',
         reply_markup=inline.baggage_availability()
     )
 
-    async with state.proxy() as proxy:
-        proxy['numbers_of_users'] = int(message.text)
+    await UserLocationFSM.is_baggage.set()
 
 
 async def with_baggage(callback: CallbackQuery, state: FSMContext):
@@ -116,7 +115,13 @@ async def with_baggage(callback: CallbackQuery, state: FSMContext):
     )
 
     async with state.proxy() as proxy:
-        proxy['is_baggage'] = 'with baggage'
+        proxy['is_baggage'] = 'С багажом'
+
+    await bot.send_message(
+        callback.from_user.id,
+        'Отправьте локацию.',
+        reply_markup=reply.set_current_locale()
+    )
 
     await UserLocationFSM.current_location.set()
 
@@ -129,7 +134,13 @@ async def without_baggage(callback: CallbackQuery, state: FSMContext):
     )
 
     async with state.proxy() as proxy:
-        proxy['is_baggage'] = 'with baggage'
+        proxy['is_baggage'] = 'Без багажа'
+
+    await bot.send_message(
+        callback.from_user.id,
+        'Отправьте локацию.',
+        reply_markup=reply.set_current_locale()
+    )
 
     await UserLocationFSM.current_location.set()
 
@@ -503,6 +514,8 @@ async def active_orders(message: Message, state: FSMContext):
             f'Заказ №{order[0]}\n\n'
             f'Откуда: {order[1]}\n\n'
             f'Куда: {order[2]}\n\n'
+            f'Количество пассажиров: {order[-2]}\n'
+            f'{order[-1]}\n\n'
             f'Дистанция: {order[3]} км.\n'
             f'Оплата: {order[4]} руб.\n'
             f'Дата создания заявки: {order[8]}\n'

@@ -10,12 +10,15 @@ import bot.keyboards.inline as inline
 import bot.keyboards.reply as reply
 
 from bot.env import *
+from bot.handlers.utils import *
 from bot.states import *
 
 lock = Lock()
 
 
-async def search_user(message: Message):
+async def search_user(message: Message, state: FSMContext):
+    await state.reset_state(with_data=True)
+
     await message.answer(
         'Введите id пользователя: '
     )
@@ -96,7 +99,9 @@ async def update_user_data(message: Message, state: FSMContext):
 #----------------------------------------------------------------
 
 
-async def search_driver(message: Message):
+async def search_driver(message: Message, state: FSMContext):
+    await state.reset_state(with_data=True)
+
     await message.answer(
         'Введите id водителя: '
     )
@@ -189,16 +194,130 @@ async def update_driver_data(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
 
+#-----------------------------------------------------------------------
+
+async def orders(message: Message, state: FSMContext):
+    await state.reset_state(with_data=True)
+
+    await message.answer(
+        'Выберите каким образом будете искать заказ',
+        reply_markup=reply.orders_btns()
+    )
+
+
+async def orders_by_republic(message: Message):
+    await message.answer(
+        'Выберите республику',
+        reply_markup=reply.all_republics()
+    )
+
+    await OrdersByRepublicFSM.republic.set()
+
+
+async def status_order(message: Message, state: FSMContext):
+
+    async with state.proxy() as proxy:
+        proxy['republic'] = message.text
+
+    await message.answer(
+        'Выберите статус',
+        reply_markup=reply.status_orders()
+    )
+
+    await OrdersByRepublicFSM.next()
+
+
+async def orders_by_data(message: Message, state: FSMContext):
+    async with state.proxy() as proxy:
+        orders = await db_select.orders_by_status_and_republic(proxy['republic'], orders_data[message.text])
+
+        if orders:
+            for order in orders:
+                await message.answer(
+                    f'Заказ №{order[0]}\n\n'
+                    f'Откуда: {order[1]}\n\n'
+                    f'Куда: {order[2]}\n\n'
+                    f'Дистанция: {order[3]} км.\n'
+                    f'Время: {order[-4]} ч.\n'
+                    f'Оплата: {order[4]} руб.\n'
+                    f'Дата создания заявки: {order[8]}\n'
+                    f'Дата выполнения заказа: {order[-3]}\n'
+                    f'Тип оплаты: {"Наличные" if order[9] == "cash" else "С баланса бота"}',
+                    reply_markup=reply.admin_panel_btns()
+                )
+        else:
+            await message.answer(
+                'Нет таких заказов',
+                reply_markup=reply.admin_panel_btns()
+            )
+    await state.reset_state(with_data=True)
+
+
+async def order_by_id(message: Message):
+    await message.answer(
+        'Введите id заказа:',
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+    await OrderByIdFSM.id.set()
+
+
+async def order_by_id_answer(message: Message, state: FSMContext):
+
+    if not message.text.isdigit():
+        await message.answer('Это не число')
+
+    order = await db_select.information_by_order(int(message.text))
+
+    if order:
+        await message.answer(
+            f'Заказ №{order[0]}\n\n'
+            f'Откуда: {order[1]}\n\n'
+            f'Куда: {order[2]}\n\n'
+            f'Статус: {get_key(order[6])}\n\n'
+            f'Дистанция: {order[3]} км.\n'
+            f'Время: {order[-2]} ч.\n'
+            f'Оплата: {order[4]} руб.\n'
+            f'Дата создания заявки: {order[8]}\n'
+            f'Дата выполнения заказа: {order[-1]}\n'
+            f'Тип оплаты: {"Наличные" if order[9] == "cash" else "С баланса бота"}',
+            reply_markup=reply.admin_panel_btns()
+        )
+    else:
+        await message.answer(
+            'Нет такого заказа',
+            reply_markup=reply.admin_panel_btns()
+        )
+
+    await state.reset_state(with_data=True)
+
+
+async def swap(message: Message):
+    await message.answer(
+        'Переключено на пассажира, чтобы вернуться обратно нажмите на /start',
+        reply_markup=reply.profile_passenger_markup()
+    )
+
+
 def register_admin_handlers(dp: Dispatcher):
-    dp.register_message_handler(search_user, lambda mes: mes.text == 'Искать пользователя')
+    dp.register_message_handler(search_user, lambda mes: mes.text == 'Искать пользователя', state='*')
+    dp.register_message_handler(search_driver, lambda mes: mes.text == 'Искать водителя', state='*')
+    dp.register_message_handler(orders, lambda mes: mes.text == 'Заказы', state='*')
+    dp.register_message_handler(swap, lambda mes: mes.text == 'Переключить на пассажира', state='*')
+
     dp.register_message_handler(data_of_passenger, state=SearchPassengerFSM.name)
     dp.register_callback_query_handler(change_user, state=ChangeDataUserFSM.user_id)
     dp.register_message_handler(changed_user, state=ChangeDataUserFSM.changed)
     dp.register_message_handler(update_user_data, state=ChangeDataUserFSM.data)
 
-    dp.register_message_handler(search_driver, lambda mes: mes.text == 'Искать водителя')
     dp.register_message_handler(data_of_driver, state=SearchDriverFSM.name)
     dp.register_callback_query_handler(change_driver, state=ChangeDataDriverFSM.user_id)
     dp.register_message_handler(changed_driver, state=ChangeDataDriverFSM.changed)
     dp.register_message_handler(update_driver_data, state=ChangeDataDriverFSM.data)
 
+    dp.register_message_handler(orders_by_republic, lambda mes: mes.text == 'По республике')
+    dp.register_message_handler(status_order, state=OrdersByRepublicFSM.republic)
+    dp.register_message_handler(orders_by_data, state=OrdersByRepublicFSM.status)
+
+    dp.register_message_handler(order_by_id, lambda mes: mes.text == 'По id')
+    dp.register_message_handler(order_by_id_answer, state=OrderByIdFSM.id)
