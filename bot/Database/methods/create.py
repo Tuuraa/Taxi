@@ -30,15 +30,16 @@ async def crate_new_driver(user_id, full_name, car, car_number, number, link, da
 
 
 async def create_order(user_id, user_location, order_location, distance, amount, republic, date, type_pay,
-                       complete_time, numbers_pass, is_baggage):
+                       complete_time, numbers_of_users, is_baggage):
     connection, cursor = await async_connect_to_my_sql()
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            'insert into orders (user_id, user_location, order_location, distance, amount, status, '
-            'republic, date, type_pay, complete_time) '
+            'insert into orders (user_id, user_location, order_location, distance, amount,'
+            'republic, date, type_pay, complete_time, numbers_of_users, is_baggage) '
             'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
-            (user_id, user_location, order_location, distance, amount, 'WAITING', republic, date, type_pay, complete_time)
+            (user_id, user_location, order_location, distance, amount, 'WAITING', republic, date, type_pay, complete_time,
+             numbers_of_users, is_baggage)
         )
 
         await connection.commit()

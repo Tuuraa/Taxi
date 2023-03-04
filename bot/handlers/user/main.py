@@ -104,13 +104,32 @@ async def number_of_passengers(message: Message, state: FSMContext):
         reply_markup=inline.baggage_availability()
     )
 
+    async with state.proxy() as proxy:
+        proxy['numbers_of_users'] = int(message.text)
+
 
 async def with_baggage(callback: CallbackQuery, state: FSMContext):
+
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    async with state.proxy() as proxy:
+        proxy['is_baggage'] = 'with baggage'
 
     await UserLocationFSM.current_location.set()
 
 
 async def without_baggage(callback: CallbackQuery, state: FSMContext):
+
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    async with state.proxy() as proxy:
+        proxy['is_baggage'] = 'with baggage'
 
     await UserLocationFSM.current_location.set()
 
@@ -360,14 +379,15 @@ async def del_pay_by_wallet(callback: CallbackQuery, state: FSMContext):
                 return
 
             await db_create.create_delivery(
-                callback.from_user.id,
-                proxy["current_delivery_location"][0],
-                proxy["delivery_order_location"][0],
-                proxy['delivery_distance'],
-                proxy['delivery_amount'],
+                proxy["current_location"][0],
+                proxy["order_location"][0],
+                proxy['distance'],
+                proxy['amount'],
                 proxy['republic'],
                 datetime.now(),
-                'wallet'
+                'wallet',
+                proxy['time'],
+
             )
 
             await bot.send_message(
@@ -408,7 +428,9 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
                 proxy['republic'],
                 datetime.now(),
                 'wallet',
-                proxy['time']
+                proxy['time'],
+                proxy['numbers_of_users'],
+                proxy['is_baggage']
             )
 
             await bot.send_message(

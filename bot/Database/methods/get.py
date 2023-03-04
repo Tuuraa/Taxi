@@ -147,3 +147,18 @@ async def information_by_order(id):
 
         result = await cursor.fetchone()
         return result
+
+
+async def all_drivers(user_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select user_id from drivers where republic = %s",
+            user_id
+        )
+
+        result = await cursor.fetchone()
+        return result
+
+
