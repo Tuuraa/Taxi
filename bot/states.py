@@ -2,6 +2,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class DriverFSM(StatesGroup):
+    accept = State()
     car_mark = State()
     car_numbers = State()
     full_name = State()
@@ -70,3 +71,12 @@ class ChangeDataDriverFSM(StatesGroup):
     user_id = State()
     changed = State()
     data = State()
+
+
+class OrdersByRepublicFSM(StatesGroup):
+    republic = State()
+    status = State()
+
+
+class OrderByIdFSM(StatesGroup):
+    id = State()
