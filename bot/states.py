@@ -16,6 +16,7 @@ class PassengerFSM(StatesGroup):
 
 class UserLocationFSM(StatesGroup):
     numbers_of_users = State()
+    is_baggage = State()
     current_location = State()
     order_location = State()
     agreed_location = State()
