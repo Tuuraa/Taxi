@@ -86,25 +86,33 @@ async def profile(message: Message, state: FSMContext):
 
 async def number_of_passengers(message: Message, state: FSMContext):
 
-    await message.answer(
-        "Какое количество пассажиров поедет.\n"
-        "Обратите внимание количество пассажиров должно быть точно указано"
-    )
-    if message.text.isdigit():
+    if not message.text.isdigit():
         await message.answer("Вы ввели не число!")
         return
 
-    if message.text > 30:
+    if int(message.text) > 30:
         await message.answer(
             "Слишком большое количество пассажиров"
         )
+        return
 
     async with state.proxy() as proxy:
         proxy['numbers_of_users'] = message.text
 
     await message.answer(
+        'Поездка осуществляется:',
         reply_markup=inline.baggage_availability()
     )
+
+
+async def with_baggage(callback: CallbackQuery, state: FSMContext):
+
+    await UserLocationFSM.current_location.set()
+
+
+async def without_baggage(callback: CallbackQuery, state: FSMContext):
+
+    await UserLocationFSM.current_location.set()
 
 
 async def current_user_location_handler(message: Message, state: FSMContext):
@@ -290,7 +298,9 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
              proxy['republic'],
              datetime.now(),
              'cash',
-             proxy['time']
+             proxy['time'],
+             proxy['numbers_of_users'],
+             proxy['is_baggage']
          )
 
         await bot.send_message(
@@ -427,11 +437,11 @@ async def order_taxi(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
     await message.answer(
-        'Отправьте локацию.',
-        reply_markup=reply.set_current_locale()
+        "Какое количество пассажиров поедет.\n"
+        "Обратите внимание количество пассажиров должно быть точно указано"
     )
 
-    await UserLocationFSM.current_location.set()
+    await UserLocationFSM.numbers_of_users.set()
 
 
 async def back(message: Message, state: FSMContext):
@@ -588,7 +598,6 @@ async def new_republic(message: Message, state: FSMContext):
 
 def register_user_handlers(dp: Dispatcher):
 
-
     dp.register_message_handler(star_login, commands=['start'], state='*')
     dp.register_message_handler(profile, lambda msg: msg.text == '👤 Профиль', state="*")
     dp.register_message_handler(order_delivery, lambda mes: mes.text == 'Заказать доставку', state="*")
@@ -617,6 +626,10 @@ def register_user_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     dp.register_callback_query_handler(apply_order, inline.cb_apply.filter(data='apply_order'))
+
+    dp.register_message_handler(number_of_passengers, state=UserLocationFSM.numbers_of_users)
+    dp.register_callback_query_handler(with_baggage, state=UserLocationFSM.is_baggage, text='with_baggage')
+    dp.register_callback_query_handler(without_baggage, state=UserLocationFSM.is_baggage, text='without_baggage')
 
     register_login_handlers(dp)
     registration_withdrow_handlers(dp)
