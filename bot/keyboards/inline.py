@@ -108,3 +108,17 @@ def not_enough_amount():
         InlineKeyboardButton('Заплатить наличными', callback_data='pay_by_cash'),
         InlineKeyboardButton('💸 Пополнить', callback_data='top_up')
     )
+
+
+def baggage_availability():
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton('С багажом', callback_data='with baggage'),
+        InlineKeyboardButton('Без багажа', callback_data='without baggage')
+    )
+
+
+def accept_terms_of_use_btns():
+    inline = InlineKeyboardMarkup().add(
+        InlineKeyboardButton('✅ Принять', callback_data='accept_agreement'),
+        InlineKeyboardButton('❌ Отклонить', callback_data='disagree_agreement'),
+    )

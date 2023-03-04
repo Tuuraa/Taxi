@@ -84,7 +84,8 @@ async def profile(message: Message, state: FSMContext):
         )
 
 
-async def number_of_passengers(message: Message):
+async def number_of_passengers(message: Message, state: FSMContext):
+
     await message.answer(
         "Какое количество пассажиров поедет.\n"
         "Обратите внимание количество пассажиров должно быть точно указано"
@@ -98,6 +99,12 @@ async def number_of_passengers(message: Message):
             "Слишком большое количество пассажиров"
         )
 
+    async with state.proxy() as proxy:
+        proxy['numbers_of_users'] = message.text
+
+    await message.answer(
+        reply_markup=inline.baggage_availability()
+    )
 
 
 async def current_user_location_handler(message: Message, state: FSMContext):
@@ -580,6 +587,7 @@ async def new_republic(message: Message, state: FSMContext):
 
 
 def register_user_handlers(dp: Dispatcher):
+
 
     dp.register_message_handler(star_login, commands=['start'], state='*')
     dp.register_message_handler(profile, lambda msg: msg.text == '👤 Профиль', state="*")

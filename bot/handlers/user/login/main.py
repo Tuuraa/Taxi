@@ -9,12 +9,35 @@ import bot.Database.methods.create as db_create
 import bot.keyboards.reply as reply
 
 from bot.env import *
+from bot.keyboards import inline
 from bot.states import *
 
 lock = Lock()
 
 
 async def driver(callback: CallbackQuery):
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+
+async def accept_terms_of_use(callback: CallbackQuery):
+
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    await bot.send_message(
+        callback.from_user.id,
+        'Вы принимаете пользовательское соглашение?',
+        reply_markup=inline.accept_terms_of_use_btns(),
+    )
+
+
+async def accept_agreement(callback: CallbackQuery):
+
     await bot.delete_message(
         callback.from_user.id,
         callback.message.message_id
@@ -113,6 +136,19 @@ async def phone_driver(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
 
+async def disagree_agreement(callback: CallbackQuery):
+
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    await bot.send_message(
+        callback.from_user.id,
+        'Вы не приняли пользовательское соглашение. Для возобновления нажмите /start'
+    )
+
+
 async def passenger(callback: CallbackQuery):
 
     await bot.delete_message(
@@ -172,6 +208,8 @@ async def phone_pass(message: Message, state: FSMContext):
 
 def register_login_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(driver, text="driver")
+    dp.register_callback_query_handler(accept_terms_of_use, text='accept_terms_of_use')
+    dp.register_callback_query_handler(accept_agreement, text='accept_agreement')
     dp.register_callback_query_handler(passenger, text="passenger")
     dp.register_message_handler(car_mark, state=DriverFSM.car_mark)
     dp.register_message_handler(driver_number, state=DriverFSM.car_numbers)
