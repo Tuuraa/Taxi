@@ -112,13 +112,13 @@ def not_enough_amount():
 
 def baggage_availability():
     return InlineKeyboardMarkup().add(
-        InlineKeyboardButton('С багажом', callback_data='with baggage'),
-        InlineKeyboardButton('Без багажа', callback_data='without baggage')
+        InlineKeyboardButton('С багажом', callback_data='with_baggage'),
+        InlineKeyboardButton('Без багажа', callback_data='without_baggage')
     )
 
 
 def accept_terms_of_use_btns():
-    inline = InlineKeyboardMarkup().add(
+    return InlineKeyboardMarkup().add(
         InlineKeyboardButton('✅ Принять', callback_data='accept_agreement'),
         InlineKeyboardButton('❌ Отклонить', callback_data='disagree_agreement'),
     )
