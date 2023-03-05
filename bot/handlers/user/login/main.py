@@ -21,19 +21,13 @@ async def driver(callback: CallbackQuery):
         callback.message.message_id
     )
 
-
-async def accept_terms_of_use(callback: CallbackQuery):
-
-    await bot.delete_message(
-        callback.from_user.id,
-        callback.message.message_id
-    )
-
     await bot.send_message(
         callback.from_user.id,
         'Вы принимаете пользовательское соглашение?',
         reply_markup=inline.accept_terms_of_use_btns(),
     )
+
+    await DriverFSM.accept.set()
 
 
 async def accept_agreement(callback: CallbackQuery):
@@ -48,6 +42,19 @@ async def accept_agreement(callback: CallbackQuery):
     )
 
     await DriverFSM.car_mark.set()
+
+
+async def disagree_agreement(callback: CallbackQuery, state: FSMContext):
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+    await bot.send_message(
+        callback.from_user.id,
+        'Для работы с ботом вы должны принять пользовательское соглашение. Для возобновления регистрации нажмите /start',
+    )
+
+    await state.reset_state(with_data=True)
 
 
 async def car_mark(message: Message, state: FSMContext):
@@ -130,7 +137,7 @@ async def phone_driver(message: Message, state: FSMContext):
         )
 
     await message.answer(
-        "Регистрация прошла успешно!✅ \nДобро пожаловать",
+        "Регистрация прошла успешно! ✅ \nДобро пожаловать",
         reply_markup=reply.profile_driver_markup()
     )
     await state.reset_state(with_data=True)
@@ -200,16 +207,17 @@ async def phone_pass(message: Message, state: FSMContext):
         )
 
     await message.answer(
-        "Регистрация прошла успешно!✅ \nДобро пожаловать",
-        reply_markup=reply.profile_passenger_markup()
+        "Регистрация прошла успешно! ✅\n"
+        "Добро пожаловать",
+        reply_markup=reply.admin_panel_btns() if message.from_user.id in admins else reply.profile_passenger_markup()
     )
     await state.reset_state(with_data=True)
 
 
 def register_login_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(driver, text="driver")
-    dp.register_callback_query_handler(accept_terms_of_use, text='accept_terms_of_use')
-    dp.register_callback_query_handler(accept_agreement, text='accept_agreement')
+    dp.register_callback_query_handler(accept_agreement, text='accept_agreement', state=DriverFSM.accept)
+    dp.register_callback_query_handler(disagree_agreement, text='disagree_agreement', state=DriverFSM.accept)
     dp.register_callback_query_handler(passenger, text="passenger")
     dp.register_message_handler(car_mark, state=DriverFSM.car_mark)
     dp.register_message_handler(driver_number, state=DriverFSM.car_numbers)

@@ -23,9 +23,10 @@ async def crate_new_driver(user_id, full_name, car, car_number, number, link, da
     async with connection.cursor() as cursor:
         await cursor.execute(
             'insert into drivers (user_id, full_name, car, car_number, number, link, date_reg, republic, balance) '
-            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
             (user_id, full_name, car, car_number, number, link, date_reg, republic, 0)
         )
+
         await connection.commit()
 
 
@@ -35,9 +36,9 @@ async def create_order(user_id, user_location, order_location, distance, amount,
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            'insert into orders (user_id, user_location, order_location, distance, amount,'
+            'insert into orders (user_id, user_location, order_location, distance, amount, status, '
             'republic, date, type_pay, complete_time, numbers_of_users, is_baggage) '
-            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+            'values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
             (user_id, user_location, order_location, distance, amount, 'WAITING', republic, date, type_pay, complete_time,
              numbers_of_users, is_baggage)
         )

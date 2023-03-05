@@ -48,7 +48,19 @@ def admin_panel_btns():
     return ReplyKeyboardMarkup(resize_keyboard=True).add(
         'Искать пользователя', 'Искать водителя'
     ).add(
-        'Что-то еще'
+        'Заказы', 'Переключить на пассажира'
+    )
+
+
+def orders_btns():
+    return ReplyKeyboardMarkup(resize_keyboard=True).add(
+        'По республике', 'По id'
+    )
+
+
+def status_orders():
+    return ReplyKeyboardMarkup(resize_keyboard=True).add(
+        'В ожидании', 'Выполнено', 'В процессе'
     )
 
 
