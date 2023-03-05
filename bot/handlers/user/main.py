@@ -575,14 +575,14 @@ async def apply_order(callback: CallbackQuery):
     await db_update.change_status_to_order('COMPLETED', order_data[1])
     await db_update.change_complete_order(datetime.now(), order_data[1])
     order_data = await db_select.information_by_order(order_data[1])
-
+    accrual_amount = order_data[4] - ((order_data[4] / 100) * 5)
     if order_data[9] == 'wallet':
-        await db_update.add_balance_from_driver(accrualamount=order_data[4]-((order_data[4]/100)*5), order_data[2])
+        await db_update.add_balance_from_driver(accrual_amount, order_data[2])
         await db_update.remove_balance_from_user(order_data[4], order_data[0])
 
         await bot.send_message(
             callback.from_user.id,
-            f'Вы успешно подтвердили выполнение заказа №{order_data[1]}. Ваш баланс пополнен на {accuralamount} р.'
+            f'Вы успешно подтвердили выполнение заказа №{order_data[1]}. Ваш баланс пополнен на {accrual_amount} р.'
         )
 
         await bot.send_message(
