@@ -150,92 +150,103 @@ async def without_baggage(callback: CallbackQuery, state: FSMContext):
 async def current_user_location_handler(message: Message, state: FSMContext):
     location = current_user_location(message)
 
-    async with state.proxy() as proxy:
-        proxy['current_location'] = location[0], location[1], location[2]
+    if location:
 
-    await message.answer(
-        "А теперь куда хотите заказать такси.\n"
-        "Для этого нажмите на скрепку 📎, и оправьте локацию, или адрес вручную куда хотите поехать\n\n"
-        "<b><i>Обратите внимание, адрес должен быть точно указан.</i></b>",
-        parse_mode='html',
-        reply_markup=reply.order_location()
-    )
+        async with state.proxy() as proxy:
+            proxy['current_location'] = location[0], location[1], location[2]
 
-    await UserLocationFSM.next()
+        await message.answer(
+            "А теперь куда хотите заказать такси.\n"
+            "Для этого нажмите на скрепку 📎, и оправьте локацию, или адрес вручную куда хотите поехать\n\n"
+            "<b><i>Обратите внимание, адрес должен быть точно указан.</i></b>",
+            parse_mode='html',
+            reply_markup=reply.order_location()
+        )
+
+        await UserLocationFSM.next()
+    else:
+        await message.answer(
+            'Не удалось распознать адрес, введите более конкретный'
+        )
 
 
 async def order_location(message: Message, state: FSMContext):
     location = current_user_location(message)
 
-    async with state.proxy() as proxy:
-        proxy['order_location'] = location[0], location[1], location[2]
+    if location:
+        async with state.proxy() as proxy:
+            proxy['order_location'] = location[0], location[1], location[2]
 
-        location_list = proxy['current_location'][0].address.split(', ')
-        republic = ''
-        user_data = await db_select.type_user(message.from_user.id)
+            location_list = proxy['current_location'][0].address.split(', ')
+            republic = ''
+            user_data = await db_select.type_user(message.from_user.id)
 
-        for loc in location_list:
-            if loc in republics:
-                republic = loc
-                break
+            for loc in location_list:
+                if loc in republics:
+                    republic = loc
+                    break
 
-        if not republic:
+            if not republic:
+                await message.answer(
+                    'В данном регионе этот сервис не работает!!',
+                    reply_markup=reply.profile_passenger_markup() if user_data == 'passenger'
+                        else reply.profile_driver_markup()
+                )
+                await state.reset_state(with_data=True)
+                return
+
             await message.answer(
-                'В данном регионе этот сервис не работает!!',
-                reply_markup=reply.profile_passenger_markup() if user_data == 'passenger'
-                    else reply.profile_driver_markup()
+                f'Откуда:\n{proxy["current_location"][0]}'
             )
-            await state.reset_state(with_data=True)
-            return
 
-        await message.answer(
-            f'Откуда:\n{proxy["current_location"][0]}'
-        )
+            await message.answer(
+                f'Куда:\n{location[0]}'
+            )
 
-        await message.answer(
-            f'Куда:\n{location[0]}'
-        )
+            first_loc = proxy['current_location'][1], proxy['current_location'][2]
+            second_loc = proxy['order_location'][1], proxy['order_location'][2]
 
-        first_loc = proxy['current_location'][1], proxy['current_location'][2]
-        second_loc = proxy['order_location'][1], proxy['order_location'][2]
+            distance = round(distance_btw_two_points(
+                current_point=first_loc,
+                order_point=second_loc
+            ).km, 3)
 
-        distance = round(distance_btw_two_points(
-            current_point=first_loc,
-            order_point=second_loc
-        ).km, 3)
-
-        if distance < 2:
-            amount = 75
-        elif 50 >= distance > 2:
-            distance = int(distance)
-            coef = ways[distance]
-            if distance < 4:
-                amount = 75 + coef * (distance - 1) + 5 * (3 + ((distance / 50) * 60) - 5)
+            if distance < 2:
+                amount = 75
+            elif 50 >= distance > 2:
+                distance = int(distance)
+                coef = ways[distance]
+                if distance < 4:
+                    amount = 75 + coef * (distance - 1) + 5 * (3 + ((distance / 50) * 60) - 5)
+                else:
+                    amount = 75 + coef * (distance - 1) + 5 * (1 + ((distance / 50) * 60) - 5)
             else:
-                amount = 75 + coef * (distance - 1) + 5 * (1 + ((distance / 50) * 60) - 5)
-        else:
-            distance = int(distance)
-            coef = ways[len(ways)]
-            amount = 75 + coef * (distance - 1) + 5 * (1 + distance / 50 - 5)
-            other_sum = int((distance - len(ways)) / 3) * 82
-            amount += other_sum
+                distance = int(distance)
+                coef = ways[len(ways)]
+                amount = 75 + coef * (distance - 1) + 5 * (1 + distance / 50 - 5)
+                other_sum = int((distance - len(ways)) / 3) * 82
+                amount += other_sum
 
-        amount = round(amount, 2)
+            amount = round(amount, 2)
 
-        proxy['distance'] = distance
-        proxy['time'] = distance / 50
-        proxy['amount'] = amount
-        proxy['republic'] = republic
+            proxy['distance'] = distance
+            proxy['time'] = distance / 50
+            proxy['amount'] = amount
+            proxy['republic'] = republic
 
+            await message.answer(
+                f'Расстояние состовляет: {distance} км.\n'
+                f'Время пути составит: {distance / 50} ч.\n'
+                f'Сумма к оплате: {amount} руб.\n'
+                f'Выберите каким образом будете оплачивать',
+                reply_markup=inline.pay_order()
+            )
+
+            await UserLocationFSM.type_pay.set()
+    else:
         await message.answer(
-            f'Расстояние состовляет: {distance} км.\n'
-            f'Время пути составит: {distance / 50} ч.\n'
-            f'Сумма к оплате: {amount} руб.\n'
-            f'Выберите каким образом будете оплачивать',
-            reply_markup=inline.pay_order()
+            'Не удалось распознать адрес, введите более конкретный'
         )
-
-        await UserLocationFSM.type_pay.set()
 
 
 async def current_delivery_location(message: Message, state: FSMContext):
