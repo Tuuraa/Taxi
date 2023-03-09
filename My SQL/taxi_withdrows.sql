@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.31, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: taxi
 -- ------------------------------------------------------
--- Server version	8.0.32
+-- Server version	8.0.31
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -29,9 +29,8 @@ CREATE TABLE `withdrows` (
   `type_bank` varchar(10) NOT NULL,
   `card` varchar(45) NOT NULL,
   `status` varchar(20) NOT NULL,
-  `date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +39,7 @@ CREATE TABLE `withdrows` (
 
 LOCK TABLES `withdrows` WRITE;
 /*!40000 ALTER TABLE `withdrows` DISABLE KEYS */;
-INSERT INTO `withdrows` VALUES (1,982616847,100,'sber','1232142313414124','WAITING','2023-02-19 00:00:00');
+INSERT INTO `withdrows` VALUES (1,855151774,100,'sber','34245723i64882','WAITING'),(5,855151774,100,'tink','6435278390435','WAITING');
 /*!40000 ALTER TABLE `withdrows` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-22 19:10:01
+-- Dump completed on 2023-02-28 23:27:40

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.31, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: taxi
 -- ------------------------------------------------------
--- Server version	8.0.32
+-- Server version	8.0.31
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -24,16 +24,17 @@ DROP TABLE IF EXISTS `delivery`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `delivery` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` bigint DEFAULT NULL,
   `delivery_location` text,
   `order_location` text,
   `distance` float DEFAULT NULL,
   `amount` float DEFAULT NULL,
-  `user_id` bigint DEFAULT NULL,
-  `status` varchar(60) DEFAULT NULL,
-  `republic` varchar(60) DEFAULT NULL,
-  `date` date DEFAULT NULL,
+  `status` varchar(15) DEFAULT NULL,
+  `republic` varchar(45) DEFAULT NULL,
+  `date` datetime DEFAULT NULL,
+  `pay_type` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,6 +43,7 @@ CREATE TABLE `delivery` (
 
 LOCK TABLES `delivery` WRITE;
 /*!40000 ALTER TABLE `delivery` DISABLE KEYS */;
+INSERT INTO `delivery` VALUES (1,855151774,'ПВ №26, улица Умара Алиева, Черкесский городской округ, Карачаево-Черкесия, Северо-Кавказский федеральный округ, 369000, Россия','37, улица Некрасова, Прикубанский округ, Краснодар, городской округ Краснодар, Краснодарский край, Южный федеральный округ, 350066, Россия',257.591,2646.67,'WAITING','Карачаево-Черкесия','2023-02-26 16:24:18','cash');
 /*!40000 ALTER TABLE `delivery` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-22 19:10:01
+-- Dump completed on 2023-02-28 23:27:40
