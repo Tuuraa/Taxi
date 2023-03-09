@@ -143,19 +143,6 @@ async def phone_driver(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
 
-async def disagree_agreement(callback: CallbackQuery):
-
-    await bot.delete_message(
-        callback.from_user.id,
-        callback.message.message_id
-    )
-
-    await bot.send_message(
-        callback.from_user.id,
-        'Вы не приняли пользовательское соглашение. Для возобновления нажмите /start'
-    )
-
-
 async def passenger(callback: CallbackQuery):
 
     await bot.delete_message(
