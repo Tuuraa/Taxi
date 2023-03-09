@@ -36,6 +36,8 @@ def current_user_location(location: Message):
         return nomin.reverse(f'{latitude} {longitude}'), latitude, longitude
     else:
         location = nomin.geocode(location.text)
+        if not location:
+            return False
         return location, location.latitude, location.longitude
 
 
