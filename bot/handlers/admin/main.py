@@ -299,10 +299,59 @@ async def swap(message: Message):
     )
 
 
+async def send_all_withdraw(message: Message):
+    withdraws = await db_select.all_withdraws()
+
+    for withdraw in withdraws:
+        await message.answer(
+            f'Id: {withdraw[0]} \n\n'
+            f'Id юзера: {withdraw[1]} \n'
+            f'Сумма: {withdraw[2]} руб. \n'
+            f'Банк: {"Сбербанк" if withdraw[3] == "sber" else "Тинькофф"} \n'
+            f'Номер карты: {withdraw[4]}',
+            reply_markup=inline.withdraw_items(withdraw[0])
+        )
+
+    await WithdrawFSM.id_withdraw.set()
+
+
+async def change_status_to_withdraw(callback: CallbackQuery, state: FSMContext):
+
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    async with state.proxy() as proxy:
+        proxy['id_withdraw'] = callback.data.split(":")[1]
+
+    await bot.send_message(
+        callback.from_user.id,
+        'Выберите статус',
+        reply_markup=reply.status_withdraws()
+    )
+
+    await WithdrawFSM.status.set()
+
+
+async def update_status_to_withdraw(message: Message, state: FSMContext):
+
+    async with state.proxy() as proxy:
+        await db_update.update_status_from_withdraw(message.text ,proxy.get('id_withdraw'))
+
+    await message.answer(
+        'Готово',
+        reply_markup=reply.admin_panel_btns()
+    )
+
+    await state.reset_state(with_data=True)
+
+
 def register_admin_handlers(dp: Dispatcher):
     dp.register_message_handler(search_user, lambda mes: mes.text == 'Искать пользователя', state='*')
     dp.register_message_handler(search_driver, lambda mes: mes.text == 'Искать водителя', state='*')
     dp.register_message_handler(orders, lambda mes: mes.text == 'Заказы', state='*')
+    dp.register_message_handler(send_all_withdraw, lambda mes: mes.text == 'Выводы', state='*')
     dp.register_message_handler(swap, lambda mes: mes.text == 'Переключить на пассажира', state='*')
 
     dp.register_message_handler(data_of_passenger, state=SearchPassengerFSM.name)
@@ -321,3 +370,6 @@ def register_admin_handlers(dp: Dispatcher):
 
     dp.register_message_handler(order_by_id, lambda mes: mes.text == 'По id')
     dp.register_message_handler(order_by_id_answer, state=OrderByIdFSM.id)
+
+    dp.register_callback_query_handler(change_status_to_withdraw, state=WithdrawFSM.id_withdraw)#inline.withdraw.filter(data='change_withdraw'))
+    dp.register_message_handler(update_status_to_withdraw, state=WithdrawFSM.status)
