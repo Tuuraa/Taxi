@@ -80,3 +80,8 @@ class OrdersByRepublicFSM(StatesGroup):
 
 class OrderByIdFSM(StatesGroup):
     id = State()
+
+
+class WithdrawFSM(StatesGroup):
+    id_withdraw = State()
+    status = State()
