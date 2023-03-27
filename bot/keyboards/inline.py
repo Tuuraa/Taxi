@@ -7,6 +7,7 @@ import bot.Database.methods.get as db_select
 cb_data = CallbackData('ibk', 'user_id', 'id_order', 'data')
 cb_apply = CallbackData('ibk', 'user_id', 'driver_id', 'order_id', 'data')
 change_pass = CallbackData('ibk', 'user_id', 'data')
+withdraw = CallbackData('ibk', 'id_withdraw', 'data')
 
 
 def check_status_btns():
@@ -121,4 +122,16 @@ def accept_terms_of_use_btns():
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton('✅ Принять', callback_data='accept_agreement'),
         InlineKeyboardButton('❌ Отклонить', callback_data='disagree_agreement'),
+    )
+
+
+def withdraw_items(id_withdraw):
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton(
+            'Изменить статус',
+            callback_data=withdraw.new(
+                id_withdraw=id_withdraw,
+                data='change_withdraw',
+            )
+        )
     )
