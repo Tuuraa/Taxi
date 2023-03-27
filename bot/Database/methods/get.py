@@ -175,3 +175,13 @@ async def all_drivers(user_id):
         return result
 
 
+async def all_withdraws():
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from withdrows where status = 'WAITING'"
+        )
+
+        result = await cursor.fetchall()
+        return result
