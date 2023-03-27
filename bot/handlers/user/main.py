@@ -587,11 +587,11 @@ async def apply_order(callback: CallbackQuery):
     order_data = [int(item) for item in callback.data.split(':')[1:-1]]
     await db_update.change_status_to_order('COMPLETED', order_data[1])
     await db_update.change_complete_order(datetime.now(), order_data[1])
-    order_data = await db_select.information_by_order(order_data[1])
-    accrual_amount = order_data[4] - ((order_data[4] / 100) * 5)
-    if order_data[9] == 'wallet':
+    order = await db_select.information_by_order(order_data[1])
+    accrual_amount = order[4] - ((order[4] / 100) * 5)
+    if order[9] == 'wallet':
         await db_update.add_balance_from_driver(accrual_amount, order_data[2])
-        await db_update.remove_balance_from_user(order_data[4], order_data[0])
+        await db_update.remove_balance_from_user(order[4], order_data[0])
 
         await bot.send_message(
             callback.from_user.id,
@@ -600,7 +600,7 @@ async def apply_order(callback: CallbackQuery):
 
         await bot.send_message(
             order_data[0],
-            f'Заказ №{order_data[1]} был подтвержден водителем. С вашего баланса было снято {order_data[4]} р.\n'
+            f'Заказ №{order_data[1]} был подтвержден водителем. С вашего баланса было снято {order[4]} р.\n'
             f'В случай ошибки напишите в тех. поддержку.'
         )
     else:
