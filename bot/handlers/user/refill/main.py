@@ -5,19 +5,12 @@ from aiogram.dispatcher import FSMContext
 from datetime import datetime, timezone
 from aiogram.types.message import ContentType
 
-import arrow
-
 from bot.states import TopUpFSM
 
 from bot.env import *
 
 import bot.Database.methods.create as db_create
-import bot.Database.methods.get as db_select
 import bot.Database.methods.update as db_update
-
-import bot.keyboards.inline as inline
-import bot.keyboards.reply as reply
-
 
 lock = Lock()
 
@@ -33,7 +26,7 @@ async def top_up(callback: CallbackQuery, state: FSMContext):
 
     await bot.send_message(
         callback.from_user.id,
-        'Введите сумму для пополнения.'
+        'Введите сумму для пополнения. От 15 руб.'
     )
 
     await TopUpFSM.amount.set()
@@ -43,9 +36,6 @@ async def create_top_up(message: Message, state: FSMContext):
     amount = int(message.text)
 
     price = LabeledPrice(label="Пополнение", amount=amount * 100)
-
-    # if payment_token.split(':')[1] == 'TEST':
-    #     await bot.send_message(message.chat.id, "Тестовый платеж!!!")
 
     await bot.send_invoice(
         message.chat.id,
@@ -60,7 +50,7 @@ async def create_top_up(message: Message, state: FSMContext):
         is_flexible=False,
         prices=[price],
         start_parameter="one-month-subscription",
-        payload="test-invoice-payload"
+        payload="payload",
     )
 
     await state.reset_state(with_data=True)
