@@ -180,3 +180,15 @@ async def update_republic_from_driver(value, user_id):
         )
 
         await connection.commit()
+
+
+async def update_status_from_withdraw(value, id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update withdrows set status = %s where id = %s', (value, id)
+        )
+
+        await connection.commit()
+
