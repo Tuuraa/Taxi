@@ -3,6 +3,8 @@ from geopy.distance import geodesic
 from aiogram.types import Message
 from json import loads
 
+from bot.Database.methods.get import *
+from bot.env import bot
 
 nomin = Nominatim(user_agent='user')
 
@@ -45,3 +47,13 @@ def distance_btw_two_points(current_point, order_point):
     distance = geodesic(current_point, order_point)
 
     return distance
+
+
+async def send_order_to_all_drivers(republic, amount):
+    user_ids = await all_drivers_by_republic(republic)
+
+    for user_id in user_ids:
+        await bot.send_message(
+            user_id[0],
+            'Поступил новый заказ на сумму {} руб.'.format(amount)
+        )
