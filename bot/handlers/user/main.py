@@ -352,6 +352,8 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
             reply_markup=reply.profile_passenger_markup()
         )
 
+        await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
+
         await state.reset_state(with_data=True)
 
 
@@ -463,6 +465,8 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
                 reply_markup=reply.profile_passenger_markup()
             )
 
+            await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
+
             await state.reset_state(with_data=True)
 
 
@@ -504,7 +508,7 @@ async def support(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
     await message.answer(
-        'По любым вопросам пишите @bluabitch\n'
+        f'По любым вопросам пишите {admin_link}\n'
         'Ответит в течении часа!'
     )
 
