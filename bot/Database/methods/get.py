@@ -185,3 +185,15 @@ async def all_withdraws():
 
         result = await cursor.fetchall()
         return result
+
+
+async def all_drivers_by_republic(republic):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select user_id from drivers where republic = %s", republic
+        )
+
+        result = await cursor.fetchall()
+        return result
