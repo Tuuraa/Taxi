@@ -593,6 +593,7 @@ async def apply_order(callback: CallbackQuery):
     await db_update.change_complete_order(datetime.now(), order_data[1])
     order = await db_select.information_by_order(order_data[1])
     accrual_amount = order[4] - ((order[4] / 100) * 5)
+    commision = (order_data[4] / 100) * 5
     if order[9] == 'wallet':
         await db_update.add_balance_from_driver(accrual_amount, order_data[2])
         await db_update.remove_balance_from_user(order[4], order_data[0])
@@ -608,9 +609,12 @@ async def apply_order(callback: CallbackQuery):
             f'В случай ошибки напишите в тех. поддержку.'
         )
     else:
+        await db_update.remove_balance_from_driver(commision, order_data[2])
+
         await bot.send_message(
             callback.from_user.id,
-            f'Заказ №{order_data[1]} успешно подтвержден.'
+            f'Заказ №{order_data[1]} успешно подтвержден.С вашего баланса был снята коммисия в размере пяти процентов'
+            f'от цена заказа {commision}'
         )
 
         await bot.send_message(

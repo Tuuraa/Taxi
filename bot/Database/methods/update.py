@@ -138,6 +138,17 @@ async def update_phone_from_driver(value, user_id):
         await connection.commit()
 
 
+async def remove_balance_from_driver(balance, driver_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update drivers set balance = balance - %s where user_id = %s', (balance, driver_id)
+        )
+
+        await connection.commit()
+
+
 async def update_balance_from_driver(value, user_id):
     connection, cursor = await async_connect_to_my_sql()
 
