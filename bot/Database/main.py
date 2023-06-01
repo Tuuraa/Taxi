@@ -10,7 +10,7 @@ class DBParameters:
     def __init__(self):
         self.Host = "localhost"
         self.Users = "root"
-        self.Password = '4789' if user == 'пк' else '5377'
+        self.Password = '4789' if user == 'пк' else '5377'#'43djdwg1r'#
         self.DB_NAME = "taxi"
         self.loop = asyncio.new_event_loop()
 

@@ -593,7 +593,8 @@ async def apply_order(callback: CallbackQuery):
     await db_update.change_complete_order(datetime.now(), order_data[1])
     order = await db_select.information_by_order(order_data[1])
     accrual_amount = order[4] - ((order[4] / 100) * 5)
-    commision = (order_data[4] / 100) * 5
+    commision = (order[4] / 100) * 5
+
     if order[9] == 'wallet':
         await db_update.add_balance_from_driver(accrual_amount, order_data[2])
         await db_update.remove_balance_from_user(order[4], order_data[0])
@@ -652,14 +653,22 @@ async def new_republic(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
 
-def register_user_handlers(dp: Dispatcher):
+async def education(message: Message):
 
+    await message.reply_document(
+        document='BQACAgIAAxkBAAIHfmQkZmslL8QnV21XY5qbR7sPFVb_AAJbLQAC2xsgSREfCe7Z9b3jLwQ'
+    )
+
+
+def register_user_handlers(dp: Dispatcher):
+    dp.register_message_handler(education, content_types=['document'])
     dp.register_message_handler(star_login, commands=['start'], state='*')
     dp.register_message_handler(profile, lambda msg: msg.text == '👤 Профиль', state="*")
     dp.register_message_handler(order_delivery, lambda mes: mes.text == 'Заказать доставку', state="*")
     dp.register_message_handler(order_taxi, lambda mes: mes.text == '🚕 Заказать такси', state="*")
     dp.register_message_handler(active_orders, lambda mes: mes.text == '🚕 Активные заказы', state="*")
     dp.register_message_handler(support, lambda mes: mes.text == '⚙️ Техническая поддержка', state="*")
+    dp.register_message_handler(education, lambda mes: mes.text == '📄 Обучение', state="*")
     dp.register_message_handler(back, lambda mes: mes.text == '⬅️ Вернуться', state='*')
 
     dp.register_callback_query_handler(change_republics, text='change_region')

@@ -29,8 +29,9 @@ CREATE TABLE `withdrows` (
   `type_bank` varchar(10) NOT NULL,
   `card` varchar(45) NOT NULL,
   `status` varchar(20) NOT NULL,
+  `date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +40,7 @@ CREATE TABLE `withdrows` (
 
 LOCK TABLES `withdrows` WRITE;
 /*!40000 ALTER TABLE `withdrows` DISABLE KEYS */;
-INSERT INTO `withdrows` VALUES (1,855151774,100,'sber','34245723i64882','WAITING'),(5,855151774,100,'tink','6435278390435','WAITING');
+INSERT INTO `withdrows` VALUES (1,855151774,100,'sber','34245723i64882','Выполнено',NULL),(5,855151774,100,'tink','6435278390435','Отменено',NULL),(6,855151774,1000,'sber','5279239726393','WAITING','2023-03-28 00:00:00');
 /*!40000 ALTER TABLE `withdrows` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-28 23:27:40
+-- Dump completed on 2023-04-03 12:36:56

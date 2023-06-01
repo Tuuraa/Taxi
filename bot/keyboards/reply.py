@@ -9,7 +9,7 @@ def profile_passenger_markup():
         KeyboardButton('🚕 Заказать такси')
     ).add(
         KeyboardButton('⚙️ Техническая поддержка'),
-        #KeyboardButton('Заказать доставку')
+        KeyboardButton('📄 Обучение')
     )
 
 
@@ -18,7 +18,8 @@ def profile_driver_markup():
         KeyboardButton('👤 Профиль'),
         KeyboardButton('🚕 Активные заказы')
     ).add(
-        KeyboardButton('⚙️ Техническая поддержка')
+        KeyboardButton('⚙️ Техническая поддержка'),
+        KeyboardButton('📄 Обучение')
     )
 
 

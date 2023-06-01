@@ -1,5 +1,3 @@
-from sqlalchemy.engine import cursor
-
 from bot.Database.main import async_connect_to_my_sql, create_sync_con
 
 
