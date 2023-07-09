@@ -125,6 +125,12 @@ def accept_terms_of_use_btns():
     )
 
 
+def send_info_to_mail():
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton('✅ Отправил', callback_data='send_info')
+    )
+
+
 def withdraw_items(id_withdraw):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(

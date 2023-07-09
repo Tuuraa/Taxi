@@ -3,6 +3,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 class DriverFSM(StatesGroup):
     accept = State()
+    send_mail = State()
     car_mark = State()
     car_numbers = State()
     full_name = State()

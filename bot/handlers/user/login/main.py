@@ -125,21 +125,41 @@ async def phone_driver(message: Message, state: FSMContext):
         return
 
     async with state.proxy() as proxy:
+        proxy['phone'] = message.text
+
+    await message.answer(
+        "Почти готово, теперь отправьте свои данные на почту \n"
+        "<ПОЧТА>",
+        reply_markup=inline.send_info_to_mail()
+    )
+
+    await DriverFSM.send_mail.set()
+
+
+async def send_info_to_mail(callback: CallbackQuery, state: FSMContext):
+    await bot.delete_message(
+        callback.from_user.id,
+        callback.message.message_id
+    )
+
+    async with state.proxy() as proxy:
         await db_create.crate_new_driver(
-            message.from_user.id,
+            callback.from_user.id,
             str(proxy['full_name']).title(),
             str(proxy['car_mark']).title(),
             str(proxy['car_numbers']).upper(),
-            message.text,
-            message.from_user.username,
+            proxy['phone'],
+            callback.from_user.username,
             datetime.now().date(),
             str(proxy['republic'])
         )
 
-    await message.answer(
+    await bot.send_message(
+        callback.from_user.id,
         "Регистрация прошла успешно! ✅ \nДобро пожаловать",
         reply_markup=reply.profile_driver_markup()
     )
+
     await state.reset_state(with_data=True)
 
 
@@ -203,6 +223,7 @@ async def phone_pass(message: Message, state: FSMContext):
 
 def register_login_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(driver, text="driver")
+    dp.register_callback_query_handler(send_info_to_mail, text='send_info', state=DriverFSM.send_mail)
     dp.register_callback_query_handler(accept_agreement, text='accept_agreement', state=DriverFSM.accept)
     dp.register_callback_query_handler(disagree_agreement, text='disagree_agreement', state=DriverFSM.accept)
     dp.register_callback_query_handler(passenger, text="passenger")
