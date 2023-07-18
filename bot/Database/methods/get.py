@@ -195,3 +195,15 @@ async def all_drivers_by_republic(republic):
 
         result = await cursor.fetchall()
         return result
+
+
+async def check_user_from_order(user_id, status="PROCESSING"):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from orders where user_id = %s and status = %s",
+        (user_id, status))
+
+        result = await cursor.fetchall()
+        return bool(result)
