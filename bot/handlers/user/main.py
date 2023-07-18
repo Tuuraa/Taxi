@@ -661,7 +661,7 @@ async def start_trevel(callback: CallbackQuery):
             f'Телефон пассажира: <b>{user_data[3]}</b>\n'
             f'Ссылка: @{user_data[4]}\n\n'
             f'<b>после нажатие на кнопку вы подтвердите что приступили к поездке',
-            reply_markup=inline.start_trevel(user_data[1], order_user_data[1], order_data_by_db[0]),
+            reply_markup=inline.start_travel(user_data[1], order_user_data[1], order_data_by_db[0]),
             parse_mode='html'
         )
 

@@ -6,6 +6,9 @@ import bot.Database.methods.get as db_select
 
 cb_data = CallbackData('ibk', 'user_id', 'id_order', 'data')
 cb_apply = CallbackData('ibk', 'user_id', 'driver_id', 'order_id', 'data')
+cb_arrival = CallbackData('ibk', 'user_id', 'driver_id', 'order_id', 'data')
+cb_start = CallbackData('ibk', 'user_id', 'driver_id', 'order_id', 'data')
+cb_cancel = CallbackData('ibk', 'user_id', 'driver_id', 'order_id', 'data')
 change_pass = CallbackData('ibk', 'user_id', 'data')
 withdraw = CallbackData('ibk', 'id_withdraw', 'data')
 
@@ -138,6 +141,48 @@ def withdraw_items(id_withdraw):
             callback_data=withdraw.new(
                 id_withdraw=id_withdraw,
                 data='change_withdraw',
+            )
+        )
+    )
+
+
+def in_Place(user_id, order_id, driver_id):
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton(
+            'Подтвердить что вы на месте',
+            callback_data=cb_apply.new(
+                user_id=user_id,
+                order_id=order_id,
+                driver_id=driver_id,
+                data='apply_order'
+            )
+        )
+    )
+
+
+def start_travel(user_id, order_id, driver_id):
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton(
+            'Подтвердить выполнение заказа',
+            callback_data=cb_apply.new(
+                user_id=user_id,
+                order_id=order_id,
+                driver_id=driver_id,
+                data='apply_order'
+            )
+        )
+    )
+
+
+def cancel_order(user_id, order_id, driver_id):
+    return InlineKeyboardMarkup().add(
+        InlineKeyboardButton(
+            'Подтвердить выполнение заказа',
+            callback_data=cb_apply.new(
+                user_id=user_id,
+                order_id=order_id,
+                driver_id=driver_id,
+                data='apply_order'
             )
         )
     )
