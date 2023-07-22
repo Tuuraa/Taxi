@@ -13,6 +13,18 @@ async def change_status_to_order(status, id):
         await connection.commit()
 
 
+async def change_driver_id_to_order(driver_id, id):
+    connection.cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update orders set driver_id = %s where id = %',
+            (driver_id, id)
+        )
+
+        await connection.commit
+
+
 async def add_top_up(user_id, amount):
     connection, cursor = await async_connect_to_my_sql()
 
