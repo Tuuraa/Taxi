@@ -779,7 +779,7 @@ async def new_republic(message: Message, state: FSMContext):
 
     await state.reset_state(with_data=True)
 
-#ffsfds
+
 async def education(message: Message):
 
     await message.reply_document(
