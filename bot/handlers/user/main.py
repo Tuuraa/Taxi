@@ -1,4 +1,5 @@
-from asyncio import Lock
+import asyncio
+from asyncio import Lock, get_event_loop
 from datetime import datetime
 
 from aiogram import Dispatcher
@@ -23,6 +24,7 @@ from ...states import *
 
 
 lock = Lock()
+loop = get_event_loop()
 
 
 async def star_login(message: Message, state: FSMContext):
