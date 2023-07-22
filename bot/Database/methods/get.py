@@ -207,3 +207,4 @@ async def check_user_from_order(user_id, status="PROCESSING"):
 
         result = await cursor.fetchall()
         return bool(result)
+
