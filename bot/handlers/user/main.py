@@ -524,7 +524,9 @@ async def order_delivery(message: Message, state: FSMContext):
 
 async def order_taxi(message: Message, state: FSMContext):
 
-
+    if not await db_select.check_user_from_order(message.from_user.id):
+        await message.answer("У вас уже есть активные заказы")
+        return
 
     await state.reset_state(with_data=True)
 
