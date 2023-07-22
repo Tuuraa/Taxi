@@ -18,6 +18,7 @@ from bot.handlers.utils import *
 from .login import register_login_handlers
 from .refill import register_refill_handlers
 from .withdraw import registration_withdrow_handlers
+from .count_down import *
 
 from bot.env import *
 from ...states import *
@@ -25,6 +26,8 @@ from ...states import *
 
 lock = Lock()
 loop = get_event_loop()
+
+count_down_list = CountDownList()
 
 
 async def star_login(message: Message, state: FSMContext):
@@ -629,7 +632,7 @@ async def responde(callback: CallbackQuery):
         )
 
 
-async def start_trevel(callback: CallbackQuery):
+async def start_travel(callback: CallbackQuery):
     async with lock:
         await bot.delete_message(
             callback.from_user.id,
@@ -642,7 +645,10 @@ async def start_trevel(callback: CallbackQuery):
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
-        await db_update.change_status_to_order('in_place', order_data[2])
+        await db_update.change_status_to_order('IN_PLACE', order_data[2])
+
+        new_count_down = Countdown(user_data[4], 1, callback.from_user.id, int(order_data[1]), loop)
+        count_down_list.add_count_down(new_count_down)
 
         await bot.send_message(
             int(order_data[1]),
@@ -822,7 +828,7 @@ def register_user_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     dp.register_callback_query_handler(in_place, inline.cb_arrival.filter(data='in_place'))
-    dp.register_callback_query_handler(start_trevel,inline.cb_start.filter(data='start_trevel'))
+    dp.register_callback_query_handler(start_travel, inline.cb_start.filter(data='start_trevel'))
     dp.register_callback_query_handler(apply_order, inline.cb_apply.filter(data='apply_order'))
     dp.register_callback_query_handler(cancel_order, inline.cb_cancel.filter(data='cancel_order'))
 

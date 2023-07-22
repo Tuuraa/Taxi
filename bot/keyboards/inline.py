@@ -146,7 +146,7 @@ def withdraw_items(id_withdraw):
     )
 
 
-def in_Place(user_id, order_id, driver_id):
+def in_place(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
             'Подтвердить что вы на месте',
