@@ -470,6 +470,7 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
             await state.reset_state(with_data=True)
 
 
+
 async def cancel_order(callback: CallbackQuery):
 
     async with lock:
@@ -820,7 +821,7 @@ def register_user_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     dp.register_callback_query_handler(in_place, inline.cb_arrival.filter(data='in_place'))
-    dp.register_callback_query_handler(start_trevel,inline.cb_start.filter(data='start_trevel'))
+    dp.register_callback_query_handler(start_trevel, inline.cb_start.filter(data='start_trevel'))
     dp.register_callback_query_handler(apply_order, inline.cb_apply.filter(data='apply_order'))
     dp.register_callback_query_handler(cancel_order, inline.cb_cancel.filter(data='cancel_order'))
 

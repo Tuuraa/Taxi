@@ -84,3 +84,8 @@ def change_driver_list():
         'Республика'
     )
 
+
+def change_order_btns():
+    return ReplyKeyboardMarkup(resize_keyboard=True).add(
+        'Изменить кол_во пассажиров', 'Тип оплаты', 'Наличие багажа', 'Всё верно'
+    )

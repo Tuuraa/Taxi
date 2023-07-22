@@ -146,7 +146,7 @@ def withdraw_items(id_withdraw):
     )
 
 
-def in_Place(user_id, order_id, driver_id):
+def in_place(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
             'Подтвердить что вы на месте',
@@ -177,7 +177,7 @@ def start_travel(user_id, order_id, driver_id):
 def cancel_order(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
-            'Подтвердить выполнение заказа',
+            'Отмена',
             callback_data=cb_apply.new(
                 user_id=user_id,
                 order_id=order_id,
