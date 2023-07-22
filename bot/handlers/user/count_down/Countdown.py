@@ -59,7 +59,7 @@ class Countdown:
 
         if isinstance(other, Countdown):
 
-            return self.name == other.name and self.id == other.id \
-                and self.driver_id == other.driver_id and self.user_id == other.user_id
+            return self.name == other.name and self.driver_id == other.driver_id \
+                and self.user_id == other.user_id
 
         return NotImplemented
