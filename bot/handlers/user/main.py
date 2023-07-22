@@ -27,7 +27,7 @@ from ...states import *
 lock = Lock()
 loop = get_event_loop()
 
-count_down_list = CountDownList()
+#count_down_list = CountDownList()
 
 
 async def star_login(message: Message, state: FSMContext):
@@ -195,7 +195,7 @@ async def order_location(message: Message, state: FSMContext):
                 await message.answer(
                     'В данном регионе этот сервис не работает!!',
                     reply_markup=reply.profile_passenger_markup() if user_data == 'passenger'
-                        else reply.profile_driver_markup()
+                    else reply.profile_driver_markup()
                 )
                 await state.reset_state(with_data=True)
                 return
@@ -507,7 +507,7 @@ async def cancel_order(callback: CallbackQuery):
     )
 
     await bot.send_message(
-        int(order_data[1]),
+        int(order_data[14]),
         f'Ваш заказ был отменен пассажиром  @{callback.from_user.username}\n\n'
         f'В случае ошибки обратитесь в тех поддержку',
         reply_markup=reply.profile_driver_markup(),
@@ -529,7 +529,7 @@ async def order_delivery(message: Message, state: FSMContext):
 
 async def order_taxi(message: Message, state: FSMContext):
 
-    if not await db_select.check_user_from_order(message.from_user.id):
+    if await db_select.check_user_from_order(message.from_user.id):
         await message.answer("У вас уже есть активные заказы")
         return
 
