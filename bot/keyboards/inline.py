@@ -150,7 +150,7 @@ def in_place(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
             'Подтвердить что вы на месте',
-            callback_data=cb_apply.new(
+            callback_data=cb_arrival.new(
                 user_id=user_id,
                 order_id=order_id,
                 driver_id=driver_id,
@@ -164,7 +164,7 @@ def start_travel(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
             'Подтвердить выполнение заказа',
-            callback_data=cb_apply.new(
+            callback_data=cb_start.new(
                 user_id=user_id,
                 order_id=order_id,
                 driver_id=driver_id,
@@ -178,7 +178,7 @@ def cancel_order(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
             'Отмена',
-            callback_data=cb_apply.new(
+            callback_data=cb_cancel.new(
                 user_id=user_id,
                 order_id=order_id,
                 driver_id=driver_id,

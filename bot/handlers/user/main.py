@@ -696,7 +696,7 @@ async def start_travel(callback: CallbackQuery):
         await bot.send_message(
             int(order_data[1]),
             f'Ваш водитель подтвердил что он находится на месте время бесплатного ожидания 5 мин.'
-            f'цена минуты 7 рублй'
+            f'цена минуты 7 рублей'
             f'@{callback.from_user.username}\n\n'
             f'Данные о нем:\n'
             f'Телефон: <b>{order_user_data[5]}</b>\n'
