@@ -605,7 +605,7 @@ async def responde(callback: CallbackQuery):
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
         await db_update.change_status_to_order('PROCESSING', order_data[2])
-        await db_update.change_driver_id_to_order(order_data[14])
+        await db_update.change_driver_id_to_order(order_user_data[1], order_data_by_db[0])
 
         await bot.send_message(
             int(order_data[1]),
@@ -633,6 +633,48 @@ async def responde(callback: CallbackQuery):
         )
 
 
+async def in_place(callback: CallbackQuery):
+    async with lock:
+        await bot.delete_message(
+            callback.from_user.id,
+            callback.message.message_id
+        )
+
+        order_data = callback.data.split(':')
+
+        user_data = await db_select.information_by_user(int(order_data[1]))
+        order_data_by_db = await db_select.information_by_order(int(order_data[2]))
+        order_user_data = await db_select.information_by_driver(callback.from_user.id)
+
+        await db_update.change_status_to_order('INPLACE', order_data[2])
+
+        await bot.send_message(
+            int(order_data[1]),
+            f'Ваш водитель подтвердил что он начал исполнение заказа.'
+            f'цена минуты 7 рублей'
+            f'@{callback.from_user.username}\n\n'
+            f'Данные о нем:\n'
+            f'Телефон: <b>{order_user_data[5]}</b>\n'
+            f'Марка машины: <b>{order_user_data[3]}</b>\n'
+            f'Номер машины: <b>{order_user_data[4]}</b>',
+            parse_mode='html'
+        )
+
+        await bot.send_message(
+            callback.from_user.id,
+            'Данные о заказе:\n\n'
+            f'Откуда: {order_data_by_db[1]}\n\n'
+            f'Куда: {order_data_by_db[2]}\n\n'
+            f'К оплате: {order_data_by_db[4]}\n'
+            f'Телефон пассажира: <b>{user_data[3]}</b>\n'
+            f'Ссылка: @{user_data[4]}\n\n'
+            f'<b>После нажатия на кнопку деньги будут списаны с счета заказчика. <i>Не нажимайте кнопку, если вы еще '
+            f'не выполнили заказ, в случай ошибки обратитесь в тех. поддержку</i></b>',
+            reply_markup=inline.start_travel(user_data[1], order_user_data[1], order_data_by_db[0]),
+            parse_mode='html'
+        )
+
+
 async def start_travel(callback: CallbackQuery):
     async with lock:
         await bot.delete_message(
@@ -646,7 +688,7 @@ async def start_travel(callback: CallbackQuery):
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
-        await db_update.change_status_to_order('IN_PLACE', order_data[2])
+        await db_update.change_status_to_order('START_TRAVEL', order_data[2])
 
         #new_count_down = Countdown(user_data[4], 1, callback.from_user.id, int(order_data[1]), loop)
         #count_down_list.add_count_down(new_count_down)
@@ -673,48 +715,6 @@ async def start_travel(callback: CallbackQuery):
             f'Ссылка: @{user_data[4]}\n\n'
             f'<b>после нажатие на кнопку вы подтвердите что приступили к поездке',
             reply_markup=inline.start_travel(user_data[1], order_user_data[1], order_data_by_db[0]),
-            parse_mode='html'
-        )
-
-
-async def in_place(callback: CallbackQuery):
-    async with lock:
-        await bot.delete_message(
-            callback.from_user.id,
-            callback.message.message_id
-        )
-
-        order_data = callback.data.split(':')
-
-        user_data = await db_select.information_by_user(int(order_data[1]))
-        order_data_by_db = await db_select.information_by_order(int(order_data[2]))
-        order_user_data = await db_select.information_by_driver(callback.from_user.id)
-
-        await db_update.change_status_to_order('in_place', order_data[2])
-
-        await bot.send_message(
-            int(order_data[1]),
-            f'Ваш водитель подтвердил что он начал исполнение заказа.'
-            f'цена минуты 7 рублей'
-            f'@{callback.from_user.username}\n\n'
-            f'Данные о нем:\n'
-            f'Телефон: <b>{order_user_data[5]}</b>\n'
-            f'Марка машины: <b>{order_user_data[3]}</b>\n'
-            f'Номер машины: <b>{order_user_data[4]}</b>',
-            parse_mode='html'
-        )
-
-        await bot.send_message(
-            callback.from_user.id,
-            'Данные о заказе:\n\n'
-            f'Откуда: {order_data_by_db[1]}\n\n'
-            f'Куда: {order_data_by_db[2]}\n\n'
-            f'К оплате: {order_data_by_db[4]}\n'
-            f'Телефон пассажира: <b>{user_data[3]}</b>\n'
-            f'Ссылка: @{user_data[4]}\n\n'
-            f'<b>После нажатия на кнопку деньги будут списаны с счета заказчика. <i>Не нажимайте кнопку, если вы еще '
-            f'не выполнили заказ, в случай ошибки обратитесь в тех. поддержку</i></b>',
-            reply_markup=inline.apply_order(user_data[1], order_user_data[1], order_data_by_db[0]),
             parse_mode='html'
         )
 
@@ -829,7 +829,7 @@ def register_user_handlers(dp: Dispatcher):
 
     dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
     dp.register_callback_query_handler(in_place, inline.cb_arrival.filter(data='in_place'))
-    dp.register_callback_query_handler(start_travel, inline.cb_start.filter(data='start_trevel'))
+    dp.register_callback_query_handler(start_travel, inline.cb_start.filter(data='start_travel'))
     dp.register_callback_query_handler(apply_order, inline.cb_apply.filter(data='apply_order'))
     dp.register_callback_query_handler(cancel_order, inline.cb_cancel.filter(data='cancel_order'))
 

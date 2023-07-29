@@ -28,6 +28,7 @@ class UserLocationFSM(StatesGroup):
     type_pay = State()
     time = State()
     amount = State()
+    driver_id = State()
 
 
 class DeliveryFSM(StatesGroup):

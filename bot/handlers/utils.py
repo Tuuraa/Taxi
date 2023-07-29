@@ -19,7 +19,7 @@ changed_data = {
 orders_data = {
     'В ожидании': 'WAITING',
     'На месте': 'INPLACE',
-    'Начало поездки': 'Start_travel',
+    'Начало поездки': 'START_TRAVEL',
     'Выполнено': 'COMPLETED',
     'В процессе': 'PROCESSING'
 }

@@ -168,7 +168,7 @@ def start_travel(user_id, order_id, driver_id):
                 user_id=user_id,
                 order_id=order_id,
                 driver_id=driver_id,
-                data='apply_order'
+                data='start_travel'
             )
         )
     )
@@ -182,7 +182,7 @@ def cancel_order(user_id, order_id, driver_id):
                 user_id=user_id,
                 order_id=order_id,
                 driver_id=driver_id,
-                data='apply_order'
+                data='cancelled'
             )
         )
     )
