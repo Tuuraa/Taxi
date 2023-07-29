@@ -154,7 +154,7 @@ def in_place(user_id, order_id, driver_id):
                 user_id=user_id,
                 order_id=order_id,
                 driver_id=driver_id,
-                data='apply_order'
+                data='in_place'
             )
         )
     )
@@ -182,7 +182,7 @@ def cancel_order(user_id, order_id, driver_id):
                 user_id=user_id,
                 order_id=order_id,
                 driver_id=driver_id,
-                data='cancelled'
+                data='cancel_order'
             )
         )
     )

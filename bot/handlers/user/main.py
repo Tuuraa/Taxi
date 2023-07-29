@@ -18,7 +18,7 @@ from bot.handlers.utils import *
 from .login import register_login_handlers
 from .refill import register_refill_handlers
 from .withdraw import registration_withdrow_handlers
-#from .count_down import *
+from count_down import CountDownList, Countdown
 
 from bot.env import *
 from ...states import *
@@ -690,13 +690,13 @@ async def start_travel(callback: CallbackQuery):
 
         await db_update.change_status_to_order('START_TRAVEL', order_data[2])
 
-        #new_count_down = Countdown(user_data[4], 1, callback.from_user.id, int(order_data[1]), loop)
-        #count_down_list.add_count_down(new_count_down)
+        new_count_down = Countdown(user_data[4], 1, callback.from_user.id, int(order_data[1]), loop)
+        count_down_list.add_count_down(new_count_down)
 
         await bot.send_message(
             int(order_data[1]),
             f'Ваш водитель подтвердил что он находится на месте время бесплатного ожидания 5 мин.'
-            f'цена минуты 7 рублей'
+            f'цена минуты 7 рублей\n'
             f'@{callback.from_user.username}\n\n'
             f'Данные о нем:\n'
             f'Телефон: <b>{order_user_data[5]}</b>\n'
@@ -713,8 +713,8 @@ async def start_travel(callback: CallbackQuery):
             f'К оплате: {order_data_by_db[4]}\n'
             f'Телефон пассажира: <b>{user_data[3]}</b>\n'
             f'Ссылка: @{user_data[4]}\n\n'
-            f'<b>после нажатие на кнопку вы подтвердите что приступили к поездке',
-            reply_markup=inline.start_travel(user_data[1], order_user_data[1], order_data_by_db[0]),
+            f'<b>после нажатие на кнопку вы подтвердите что приступили к поездке</b>',
+            reply_markup=inline.apply_order(user_data[1], order_user_data[1], order_data_by_db[0]),
             parse_mode='html'
         )
 
