@@ -163,7 +163,7 @@ def in_place(user_id, order_id, driver_id):
 def start_travel(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
-            'Подтвердить выполнение заказа',
+            'Подтвердить начало поедзки',
             callback_data=cb_start.new(
                 user_id=user_id,
                 order_id=order_id,

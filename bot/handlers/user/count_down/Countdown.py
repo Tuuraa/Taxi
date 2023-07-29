@@ -19,14 +19,15 @@ class Countdown:
         self.args = args
         self.kwargs = kwargs
 
-        try:
-            self.count_down = loop.loop.create_task(self.run_count_down())
-        finally:
-            self.close_coroutine()
+        print("create task")
+        self.count_down = loop.create_task(self.run_count_down())
 
     async def run_count_down(self):
+        print("start task")
         while True:
 
+            print(self.name, self.driver_id,
+                  f'{self.canceled_time - self.total_second} second left', '\n')
             await asyncio.sleep(self.step)
             self.total_second += self.step
 
@@ -39,7 +40,7 @@ class Countdown:
 
     def time_is_up(self):
         self.count_down.cancel()
-
+        print("time is over")
         return {
             "driver_id": self.driver_id,
             "user_id": self.user_id

@@ -18,7 +18,7 @@ from bot.handlers.utils import *
 from .login import register_login_handlers
 from .refill import register_refill_handlers
 from .withdraw import registration_withdrow_handlers
-from count_down import *
+from .count_down import *
 
 from bot.env import *
 from ...states import *
@@ -646,6 +646,10 @@ async def in_place(callback: CallbackQuery):
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
+        new_count_down = Countdown(user_data[4], 1, callback.from_user.id, int(order_data[1]), loop,
+                                   step=3, canceled_time=9)
+        count_down_list.add_count_down(new_count_down)
+
         await db_update.change_status_to_order('INPLACE', order_data[2])
 
         await bot.send_message(
@@ -690,8 +694,6 @@ async def start_travel(callback: CallbackQuery):
 
         await db_update.change_status_to_order('START_TRAVEL', order_data[2])
 
-        new_count_down = Countdown(user_data[4], 1, callback.from_user.id, int(order_data[1]), loop)
-        count_down_list.add_count_down(new_count_down)
 
         await bot.send_message(
             int(order_data[1]),
