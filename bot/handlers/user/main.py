@@ -18,7 +18,7 @@ from bot.handlers.utils import *
 from .login import register_login_handlers
 from .refill import register_refill_handlers
 from .withdraw import registration_withdrow_handlers
-from count_down import CountDownList, Countdown
+from count_down import *
 
 from bot.env import *
 from ...states import *
@@ -27,7 +27,7 @@ from ...states import *
 lock = Lock()
 loop = get_event_loop()
 
-#count_down_list = CountDownList()
+count_down_list = CountDownList()
 
 
 async def star_login(message: Message, state: FSMContext):
