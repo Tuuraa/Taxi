@@ -704,6 +704,16 @@ async def start_travel(callback: CallbackQuery):
 
         order_data = callback.data.split(':')
 
+        status = db_select.get_status_from_order(int(order_data[2]))
+
+        if status == "CANCELED":
+            await bot.send_message(
+                callback.from_user.id,
+                "Данный заказ уже отменен!"
+            )
+
+            return
+
         user_data = await db_select.information_by_user(int(order_data[1]))
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
