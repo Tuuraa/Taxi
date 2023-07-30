@@ -483,28 +483,21 @@ async def cancel_order(callback: CallbackQuery):
             callback.message.message_id
         )
 
-    user_balance = await db_select.balance_by_user(callback.from_user.id)
-    if user_balance < int(100):
-        await bot.send_message(
-            callback.from_user.id,
-            "Не достаточно средств на балансе для совершения отмены",
-            reply_markup=inline.not_enough_amount()
-        )
-        return
-
     order_data = callback.data.split(':')
 
+    await db_update.remove_balance_from_user(100, callback.from_user.id)
     await db_update.change_status_to_order('CANCELED', order_data[2])
 
     await bot.send_message(
         callback.from_user.id,
-        f'Вы успешно отменили заказ \n\n',
+        f'Вы успешно отменили заказ. С вашего счета было списано 100 руб.  \n'
+        f'Обращаем внимание что вы не сможете заказывать такси если у вас будет отрицательный баланс в боте\n',
         reply_markup=reply.profile_passenger_markup(),
         parse_mode='html'
     )
 
     await bot.send_message(
-        int(order_data[14]),
+        int(order_data[3]),
         f'Ваш заказ был отменен пассажиром  @{callback.from_user.username}\n\n'
         f'В случае ошибки обратитесь в тех поддержку',
         reply_markup=reply.profile_driver_markup(),
