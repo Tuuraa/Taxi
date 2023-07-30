@@ -466,7 +466,7 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
 
             await bot.send_message(
                 callback.from_user.id,
-                'Заказ успешно создан.Хотели бы изменить что-то?',
+                'Заказ успешно создан.',
                 reply_markup=reply.profile_passenger_markup()
             )
 
@@ -570,15 +570,6 @@ async def support(message: Message, state: FSMContext):
 
 async def active_orders(message: Message, state: FSMContext):
 
-    #driver_balance = await db_select.balance_by_driver()
-
-    #if driver_balance < int(100):
-        #await bot.send_message(
-            #message.from_user.id,
-            #'Пока у вас отрицательный баланс вы не можете принимать заказы.',
-            #reply_markup=reply.profile_driver_markup()
-        #)
-
     await state.reset_state(with_data=True)
 
     republic = await db_select.republic_by_driver(message.from_user.id)
@@ -649,14 +640,24 @@ async def responde(callback: CallbackQuery):
 
 
 async def in_place(callback: CallbackQuery):
-    async with lock:
 
+    async with lock:
         await bot.delete_message(
             callback.from_user.id,
             callback.message.message_id
         )
 
         order_data = callback.data.split(':')
+
+        status = db_select.get_status_from_order(int(order_data[2]))
+
+        if status == "CANCELED":
+            await bot.send_message(
+                callback.from_user.id,
+                "Данный заказ уже отменен!"
+            )
+
+            return
 
         user_data = await db_select.information_by_user(int(order_data[1]))
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
