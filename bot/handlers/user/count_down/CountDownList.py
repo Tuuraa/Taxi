@@ -16,3 +16,11 @@ class CountDownList:
     def remove_count_down(self, current_count_down):
         self.__count_down_list.remove(current_count_down)
 
+    def get_element_from_count_down(self, id_by_element):
+        try:
+            return self.__count_down_list[id_by_element]
+        finally:
+            print("Exception from 'get_element_from_count_down'")
+
+
+
