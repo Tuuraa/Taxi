@@ -215,3 +215,15 @@ async def update_status_from_withdraw(value, id):
 
         await connection.commit()
 
+
+async def update_total_amount_by_order(order_id, add_amount):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "update orders set amount = amount + %s where id = order_id = %s",
+            add_amount, order_id
+        )
+
+        await connection.commit()
+
