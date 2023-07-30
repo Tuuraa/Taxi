@@ -25,6 +25,30 @@ async def change_driver_id_to_order(driver_id, id):
         await connection.commit()
 
 
+async def update_quantity_of_passangers(value, id_order):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update orders set numbers_of_users = %s where id = %s',
+            (value, id_order)
+        )
+
+        await connection.commit
+
+
+async def update_is_baggage(value, id_order):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'update orders set is_baggage = %s where id = %s',
+            (value, id_order)
+        )
+
+        await connection.commit
+
+
 async def add_top_up(user_id, amount):
     connection, cursor = await async_connect_to_my_sql()
 

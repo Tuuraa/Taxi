@@ -71,7 +71,6 @@ def status_withdraws():
     )
 
 
-
 def change_user_list():
     return ReplyKeyboardMarkup(resize_keyboard=True).add(
         'ФИО', 'Телефон', 'Баланс'
@@ -87,5 +86,5 @@ def change_driver_list():
 
 def change_order_btns():
     return ReplyKeyboardMarkup(resize_keyboard=True).add(
-        'Изменить кол_во пассажиров', 'Тип оплаты', 'Наличие багажа', 'Всё верно'
+        'Изменить кол_во пассажиров', 'Наличие багажа', 'Всё верно'
     )
