@@ -68,6 +68,7 @@ async def successful_payment(message: Message):
             f"{total_amount} "
             f"{message.successful_payment.currency} прошел успешно!!!"
         )
+
         await db_update.add_top_up(
             message.from_user.id,
             total_amount
