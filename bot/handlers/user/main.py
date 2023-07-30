@@ -466,11 +466,11 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
 
             await bot.send_message(
                 callback.from_user.id,
-                'Заказ успешно создан.',
-                reply_markup=reply.profile_passenger_markup()
+                'Заказ успешно создан.Хотели бы изменить что-то?',
+                reply_markup=reply.change_order_btns()
             )
 
-            await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
+            #await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
 
             await state.reset_state(with_data=True)
 
@@ -513,6 +513,22 @@ async def cancel_order(callback: CallbackQuery):
         reply_markup=reply.profile_driver_markup(),
         parse_mode='html'
     )
+
+
+async def change_order(message: Message, state: FSMContext):
+
+    async with state.proxy() as proxy:
+
+        if proxy['changed'] == 'Изменить кол_во пассажиров':
+            await db_update.update_name_from_driver(message.text, int(proxy['user_id']))
+        elif proxy['changed'] == 'Надичие багажа':
+            await db_update.update_balance_from_driver(message.text, int(proxy['user_id']))
+            await message.answer(
+                'Данные успешно обновлены',
+                reply_markup=reply.profile_passenger_markup()
+            )
+
+        await state.reset_state(with_data=True)
 
 
 async def order_delivery(message: Message, state: FSMContext):
