@@ -466,11 +466,11 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
 
             await bot.send_message(
                 callback.from_user.id,
-                'Заказ успешно создан.Хотели бы изменить что-то?',
-                reply_markup=reply.change_order_btns()
+                'Заказ успешно создан.',
+                reply_markup=reply.profile_passenger_markup()
             )
 
-            #await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
+            await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
 
             await state.reset_state(with_data=True)
 
@@ -640,6 +640,7 @@ async def responde(callback: CallbackQuery):
 
 
 async def in_place(callback: CallbackQuery):
+
     async with lock:
         await bot.delete_message(
             callback.from_user.id,
@@ -647,6 +648,16 @@ async def in_place(callback: CallbackQuery):
         )
 
         order_data = callback.data.split(':')
+
+        status = db_select.get_status_from_order(int(order_data[2]))
+
+        if status == "CANCELED":
+            await bot.send_message(
+                callback.from_user.id,
+                "Данный заказ уже отменен!"
+            )
+
+            return
 
         user_data = await db_select.information_by_user(int(order_data[1]))
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))

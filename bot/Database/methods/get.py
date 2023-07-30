@@ -208,3 +208,14 @@ async def check_user_from_order(user_id, status="PROCESSING"):
         result = await cursor.fetchall()
         return bool(result)
 
+
+async def get_status_from_order(order_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select status from orders where id = %s", order_id
+        )
+
+        result = await cursor.fetchone()
+        return result
