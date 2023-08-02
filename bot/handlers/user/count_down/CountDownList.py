@@ -16,7 +16,7 @@ class CountDownList:
     def remove_count_down(self, current_count_down):
         self.__count_down_list.remove(current_count_down)
 
-    def get_element_from_count_down(self, id_by_element):
+    def get_element_from_count_down_list(self, id_by_element):
         try:
             for element_from_count_down in self.__count_down_list:
                 if element_from_count_down == id_by_element:
