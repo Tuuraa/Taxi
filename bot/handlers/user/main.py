@@ -620,7 +620,7 @@ async def active_orders(message: Message, state: FSMContext):
         )
 
 
-async def responde(callback: CallbackQuery):
+async def response(callback: CallbackQuery):
 
     async with lock:
         await bot.delete_message(
@@ -742,7 +742,7 @@ async def start_travel(callback: CallbackQuery):
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
-        current_cd = count_down_list.get_element_from_count_down(order_data_by_db[0])
+        current_cd = count_down_list.get_element_from_count_down_list(order_data_by_db[0])
         count_down_list.remove_count_down(current_cd)
         current_cd_data = current_cd.close_coroutine()
 
@@ -887,7 +887,7 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(pay_by_cash, text='pay_by_cash', state=UserLocationFSM.type_pay)
     dp.register_callback_query_handler(pay_by_wallet, text='pay_by_wallet', state=UserLocationFSM.type_pay)
 
-    dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
+    dp.register_callback_query_handler(response, inline.cb_data.filter(data='responde'))
     dp.register_callback_query_handler(in_place, inline.cb_arrival.filter(data='in_place'))
     dp.register_callback_query_handler(start_travel, inline.cb_start.filter(data='start_travel'))
     dp.register_callback_query_handler(apply_order, inline.cb_apply.filter(data='apply_order'))
