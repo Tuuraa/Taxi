@@ -608,7 +608,7 @@ async def active_orders(message: Message, state: FSMContext):
         )
 
 
-async def responde(callback: CallbackQuery):
+async def response(callback: CallbackQuery):
 
     async with lock:
         await bot.delete_message(
@@ -875,7 +875,7 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(pay_by_cash, text='pay_by_cash', state=UserLocationFSM.type_pay)
     dp.register_callback_query_handler(pay_by_wallet, text='pay_by_wallet', state=UserLocationFSM.type_pay)
 
-    dp.register_callback_query_handler(responde, inline.cb_data.filter(data='responde'))
+    dp.register_callback_query_handler(response, inline.cb_data.filter(data='responde'))
     dp.register_callback_query_handler(in_place, inline.cb_arrival.filter(data='in_place'))
     dp.register_callback_query_handler(start_travel, inline.cb_start.filter(data='start_travel'))
     dp.register_callback_query_handler(apply_order, inline.cb_apply.filter(data='apply_order'))
