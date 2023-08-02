@@ -226,7 +226,7 @@ async def get_last_id_from_orders():
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            "select * from orders where id=LAST_INSERT_ID();"
+            "select * from orders where id=LAST_INSERT_ID()"
         )
 
         result = await cursor.fetchone()
