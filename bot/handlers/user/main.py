@@ -355,7 +355,11 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
             callback.from_user.id,
             'Заказ успешно создан.',
 
-            reply_markup=inline.cancel_order()
+            reply_markup=inline.cancel_order(
+                callback.from_user.id,
+                await db_select.get_last_id_from_orders(),
+                None
+            )
         )
         await bot.send_message(
             callback.from_user.id,
@@ -473,8 +477,11 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
             await bot.send_message(
                 callback.from_user.id,
                 'Заказ успешно создан.',
-
-                reply_markup=inline.cancel_order()
+                reply_markup=inline.cancel_order(
+                    callback.from_user.id,
+                    await db_select.get_last_id_from_orders(),
+                    None
+                )
             )
 
             await bot.send_message(
@@ -508,13 +515,14 @@ async def cancel_order(callback: CallbackQuery):
         parse_mode='html'
     )
 
-    await bot.send_message(
-        int(order_data[3]),
-        f'Ваш заказ был отменен пассажиром  @{callback.from_user.username}\n\n'
-        f'В случае ошибки обратитесь в тех поддержку',
-        reply_markup=reply.profile_driver_markup(),
-        parse_mode='html'
-    )
+    if int(order_data[3]) is not None:
+        await bot.send_message(
+            int(order_data[3]),
+            f'Ваш заказ был отменен пассажиром  @{callback.from_user.username}\n\n'
+            f'В случае ошибки обратитесь в тех поддержку',
+            reply_markup=reply.profile_driver_markup(),
+            parse_mode='html'
+        )
 
 
 async def change_order(message: Message, state: FSMContext):
@@ -548,14 +556,7 @@ async def order_delivery(message: Message, state: FSMContext):
 async def order_taxi(message: Message, state: FSMContext):
     user_balance = await db_select.balance_by_user(message.from_user.id)
 
-    if await db_select.check_status_to_waiting(message.from_user.id):
-        await message.answer("У вас уже есть активные заказы")
-
-    elif await db_select.check_status_in_place(message.from_user.id):
-        await message.answer("У вас уже есть активные заказы")
-        return
-
-    elif await db_select.check_user_from_order(message.from_user.id):
+    if await db_select.check_wrong_status_to_cancel(message.from_user.id):
         await message.answer("У вас уже есть активные заказы")
         return
 
@@ -787,8 +788,10 @@ async def apply_order(callback: CallbackQuery):
     )
 
     order_data = [int(item) for item in callback.data.split(':')[1:-1]]
+
     await db_update.change_status_to_order('COMPLETED', order_data[1])
     await db_update.change_complete_order(datetime.now(), order_data[1])
+
     order = await db_select.information_by_order(order_data[1])
     accrual_amount = order[4] - ((order[4] / 100) * 5)
     commision = (order[4] / 100) * 5
