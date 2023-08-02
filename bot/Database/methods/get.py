@@ -197,37 +197,13 @@ async def all_drivers_by_republic(republic):
         return result
 
 
-async def check_user_from_order(user_id, status="PROCESSING"):
+async def check_wrong_status_to_cancel(user_id):
     connection, cursor = await async_connect_to_my_sql()
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            "select * from orders where user_id = %s and status = %s",
-        (user_id, status))
-
-        result = await cursor.fetchall()
-        return bool(result)
-
-
-async def check_status_in_place(user_id, status="INPLACE"):
-    connection, cursor = await async_connect_to_my_sql()
-
-    async with connection.cursor() as cursor:
-        await cursor.execute(
-            "select * from orders where user_id = %s and status = %s",
-        (user_id, status))
-
-        result = await cursor.fetchall()
-        return bool(result)
-
-
-async def check_status_to_waiting(user_id, status="WAITING"):
-    connection, cursor = await async_connect_to_my_sql()
-
-    async with connection.cursor() as cursor:
-        await cursor.execute(
-            "select * from orders where user_id = %s and status = %s",
-        (user_id, status))
+            "select * from orders where user_id = %s and status = 'WAITING' "
+            "or status = 'IN_PLACE' or status = 'PROCESSING'", user_id)
 
         result = await cursor.fetchall()
         return bool(result)
@@ -243,3 +219,15 @@ async def get_status_from_order(order_id):
 
         result = await cursor.fetchone()
         return result
+
+
+async def get_last_id_from_orders():
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from your_table where id=LAST_INSERT_ID();"
+        )
+
+        result = await cursor.fetchone()
+        return result[0]
