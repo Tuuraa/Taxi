@@ -354,6 +354,12 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
         await bot.send_message(
             callback.from_user.id,
             'Заказ успешно создан.',
+
+            reply_markup=inline.cancel_order()
+        )
+        await bot.send_message(
+            callback.from_user.id,
+            'Вы так же можете отменить заказ',
             reply_markup=reply.profile_passenger_markup()
         )
 
@@ -467,6 +473,12 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
             await bot.send_message(
                 callback.from_user.id,
                 'Заказ успешно создан.',
+
+                reply_markup=inline.cancel_order()
+            )
+
+            await bot.send_message(
+                'Вы также можете его отменить  в случае ошибки',
                 reply_markup=reply.profile_passenger_markup()
             )
 
