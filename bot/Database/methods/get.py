@@ -209,6 +209,30 @@ async def check_user_from_order(user_id, status="PROCESSING"):
         return bool(result)
 
 
+async def check_status_in_place(user_id, status="INPLACE"):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from orders where user_id = %s and status = %s",
+        (user_id, status))
+
+        result = await cursor.fetchall()
+        return bool(result)
+
+
+async def check_status_to_waiting(user_id, status="WAITING"):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            "select * from orders where user_id = %s and status = %s",
+        (user_id, status))
+
+        result = await cursor.fetchall()
+        return bool(result)
+
+
 async def get_status_from_order(order_id):
     connection, cursor = await async_connect_to_my_sql()
 

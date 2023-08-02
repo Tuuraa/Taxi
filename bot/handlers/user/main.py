@@ -240,7 +240,7 @@ async def order_location(message: Message, state: FSMContext):
             proxy['republic'] = republic
 
             await message.answer(
-                f'Расстояние состовляет: {distance} км.\n'
+                f'Расстояние состовляет: {distance * 1.56} кмc.\n'
                 f'Время пути составит: {distance / 50} ч.\n'
                 f'Сумма к оплате: {amount} руб.\n'
                 f'Выберите каким образом будете оплачивать',
@@ -317,7 +317,7 @@ async def delivery_order_location(message: Message, state: FSMContext):
         proxy['republic'] = republic
 
         await message.answer(
-            f'Расстояние состовляет: {distance} км.\n'
+            f'Расстояние состовляет: {distance * 1,56} км.\n'
             f'Время пути составит: {distance / 50} ч.\n'
             f'Сумма к оплате: {amount} руб.\n'
             f'Выберите каким образом будете оплачивать',
@@ -534,17 +534,29 @@ async def order_delivery(message: Message, state: FSMContext):
 
 
 async def order_taxi(message: Message, state: FSMContext):
+    user_balance = await db_select.balance_by_user(message.from_user.id)
 
-    if await db_select.check_user_from_order(message.from_user.id):
+    if await db_select.check_status_to_waiting(message.from_user.id):
+        await message.answer("У вас уже есть активные заказы")
+
+    elif await db_select.check_status_in_place(message.from_user.id):
         await message.answer("У вас уже есть активные заказы")
         return
 
-    await state.reset_state(with_data=True)
+    elif await db_select.check_user_from_order(message.from_user.id):
+        await message.answer("У вас уже есть активные заказы")
+        return
 
-    await message.answer(
-        "Какое количество пассажиров поедет.\n"
-        "Обратите внимание количество пассажиров должно быть точно указано"
-    )
+    elif user_balance < 0:
+        await message.answer('Не достаточно средств для заказа такси')
+        return
+    else:
+        await message.answer(
+            "Какое количество пассажиров поедет.\n"
+            "Обратите внимание количество пассажиров должно быть точно указано"
+        )
+
+    await state.reset_state(with_data=True)
 
     await UserLocationFSM.numbers_of_users.set()
 
@@ -649,9 +661,9 @@ async def in_place(callback: CallbackQuery):
 
         order_data = callback.data.split(':')
 
-        status = db_select.get_status_from_order(int(order_data[2]))
+        status = await db_select.get_status_from_order(int(order_data[2]))
 
-        if status == "CANCELED":
+        if status[0] == "CANCELED":
             await bot.send_message(
                 callback.from_user.id,
                 "Данный заказ уже отменен!"
@@ -704,9 +716,9 @@ async def start_travel(callback: CallbackQuery):
 
         order_data = callback.data.split(':')
 
-        status = db_select.get_status_from_order(int(order_data[2]))
+        status = await db_select.get_status_from_order(int(order_data[2]))
 
-        if status == "CANCELED":
+        if status[0] == "CANCELED":
             await bot.send_message(
                 callback.from_user.id,
                 "Данный заказ уже отменен!"
