@@ -230,4 +230,4 @@ async def get_last_id_from_orders():
         )
 
         result = await cursor.fetchone()
-        return result[0]
+        return int(result[0]) + 1
