@@ -730,7 +730,7 @@ async def start_travel(callback: CallbackQuery):
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
-        current_cd = count_down_list.get_element_from_count_down(order_data_by_db[0])
+        current_cd = count_down_list.get_element_from_count_down_list(order_data_by_db[0])
         count_down_list.remove_count_down(current_cd)
         current_cd_data = current_cd.close_coroutine()
 
