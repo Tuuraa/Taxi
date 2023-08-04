@@ -177,7 +177,7 @@ def start_travel(user_id, order_id, driver_id):
 def cancel_order(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
-            'Отмена',
+            'Отменить заказ',
             callback_data=cb_cancel.new(
                 user_id=user_id,
                 order_id=order_id,
