@@ -240,8 +240,8 @@ async def order_location(message: Message, state: FSMContext):
             proxy['republic'] = republic
 
             await message.answer(
-                f'Расстояние состовляет: {distance * 1.56} кмc.\n'
-                f'Время пути составит: {distance / 50} ч.\n'
+                f'Расстояние составляет: {round(distance * 1.56)} км.\n'
+                f'Время пути составит: {round(distance / 50)} ч.\n'
                 f'Сумма к оплате: {amount} руб.\n'
                 f'Выберите каким образом будете оплачивать',
                 reply_markup=inline.pay_order()
@@ -317,8 +317,8 @@ async def delivery_order_location(message: Message, state: FSMContext):
         proxy['republic'] = republic
 
         await message.answer(
-            f'Расстояние состовляет: {distance * 1,56} км.\n'
-            f'Время пути составит: {distance / 50} ч.\n'
+            f'Расстояние составляет: {round(distance * 1,56)} км.\n'
+            f'Время пути составит: {round(distance / 50)} ч.\n'
             f'Сумма к оплате: {amount} руб.\n'
             f'Выберите каким образом будете оплачивать',
             reply_markup=inline.pay_delivery()
@@ -354,17 +354,17 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
         await bot.send_message(
             callback.from_user.id,
             'Заказ успешно создан.',
+            reply_markup=reply.profile_passenger_markup()
+        )
 
+        await bot.send_message(
+            callback.from_user.id,
+            'Вы также можете его отменить  в случае ошибки.',
             reply_markup=inline.cancel_order(
                 callback.from_user.id,
                 0,
                 await db_select.get_last_id_from_orders()
             )
-        )
-        await bot.send_message(
-            callback.from_user.id,
-            'Вы так же можете отменить заказ',
-            reply_markup=reply.profile_passenger_markup()
         )
 
         await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
@@ -477,17 +477,17 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
             await bot.send_message(
                 callback.from_user.id,
                 'Заказ успешно создан.',
+                reply_markup=reply.profile_passenger_markup()
+            )
+
+            await bot.send_message(
+                callback.from_user.id,
+                'Вы также можете его отменить  в случае ошибки.',
                 reply_markup=inline.cancel_order(
                     callback.from_user.id,
                     0,
                     await db_select.get_last_id_from_orders()
                 )
-            )
-
-            await bot.send_message(
-                callback.from_user.id,
-                'Вы также можете его отменить  в случае ошибки',
-                reply_markup=reply.profile_passenger_markup()
             )
 
             await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
@@ -702,9 +702,8 @@ async def in_place(callback: CallbackQuery):
 
         await bot.send_message(
             int(order_data[1]),
-            f'Ваш водитель подтвердил что он находится на месте.'
-            f'Время бесплатного ожидания 5 минут.Дальше цена будет расти как  7 рублей за минуту'
-            f'@{callback.from_user.username}\n\n'
+            f'Ваш водитель @{callback.from_user.username} подтвердил что он находится на месте.\n'
+            f'Время бесплатного ожидания 5 минут.Дальше цена будет расти как  7 рублей за минуту\n\n'
             f'Данные о нем:\n'
             f'Телефон: <b>{order_user_data[5]}</b>\n'
             f'Марка машины: <b>{order_user_data[3]}</b>\n'
@@ -763,8 +762,7 @@ async def start_travel(callback: CallbackQuery):
 
         await bot.send_message(
             int(order_data[1]),
-            f'Ваш водитель подтвердил начало поездки.'
-            f'@{callback.from_user.username}\n\n'
+            f'Ваш водитель @{callback.from_user.username} подтвердил начало поездки.\n\n'
             f'Данные о нем:\n'
             f'Телефон: <b>{order_user_data[5]}</b>\n'
             f'Марка машины: <b>{order_user_data[3]}</b>\n'
