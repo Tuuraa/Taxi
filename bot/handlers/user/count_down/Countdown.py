@@ -32,6 +32,8 @@ class Countdown:
             await asyncio.sleep(self.step)
             self.total_second += self.step
 
+            self.total_sum += 7
+
             if self.total_second == self.warning_time:
                 await bot.send_message(
                     self.user_id,
@@ -47,9 +49,9 @@ class Countdown:
                     "иначе заказ будет отменен, и с вашего баланса спишется 150 руб."
                 )
 
-            if self.total_second > self.time_for_add_paid \
-                    and self.total_second % 60 == 0:
-                self.total_sum += self.paid_sum
+            # if self.total_second > self.time_for_add_paid \
+            #         and self.total_second % 60 == 0:
+            #     self.total_sum += self.paid_sum
 
             if self.total_second >= self.canceled_time:
                 await self.time_is_up()
@@ -94,7 +96,6 @@ class Countdown:
 
         if isinstance(other, Countdown):
 
-            return self.name == other.name and self.driver_id == other.driver_id \
-                and self.user_id == other.user_id
+            return self.id == other.id
 
         return NotImplemented

@@ -357,8 +357,8 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
 
             reply_markup=inline.cancel_order(
                 callback.from_user.id,
-                await db_select.get_last_id_from_orders(),
-                None
+                0,
+                await db_select.get_last_id_from_orders()
             )
         )
         await bot.send_message(
@@ -479,12 +479,13 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
                 'Заказ успешно создан.',
                 reply_markup=inline.cancel_order(
                     callback.from_user.id,
-                    await db_select.get_last_id_from_orders(),
-                    None
+                    0,
+                    await db_select.get_last_id_from_orders()
                 )
             )
 
             await bot.send_message(
+                callback.from_user.id,
                 'Вы также можете его отменить  в случае ошибки',
                 reply_markup=reply.profile_passenger_markup()
             )
@@ -515,7 +516,7 @@ async def cancel_order(callback: CallbackQuery):
         parse_mode='html'
     )
 
-    if int(order_data[3]) is not None:
+    try:
         await bot.send_message(
             int(order_data[3]),
             f'Ваш заказ был отменен пассажиром  @{callback.from_user.username}\n\n'
@@ -523,6 +524,8 @@ async def cancel_order(callback: CallbackQuery):
             reply_markup=reply.profile_driver_markup(),
             parse_mode='html'
         )
+    except:
+        pass
 
 
 async def change_order(message: Message, state: FSMContext):
@@ -645,7 +648,11 @@ async def response(callback: CallbackQuery):
             f'Телефон: <b>{order_user_data[5]}</b>\n'
             f'Марка машины: <b>{order_user_data[3]}</b>\n'
             f'Номер машины: <b>{order_user_data[4]}</b>',
-            reply_markup=inline.cancel_order(user_data[1], order_user_data[1], order_data_by_db[0]),
+            reply_markup=inline.cancel_order(
+                user_data[1],
+                order_user_data[1],
+                order_data_by_db[0]
+            ),
             parse_mode='html'
         )
 
@@ -688,7 +695,7 @@ async def in_place(callback: CallbackQuery):
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
-        new_cd = Countdown(user_data[4], order_data_by_db[0], callback.from_user.id, int(order_data[1]), loop)
+        new_cd = Countdown(user_data[4], order_data_by_db[0], callback.from_user.id, int(order_data[1]), loop, step=2)
         count_down_list.add_count_down(new_cd)
 
         await db_update.change_status_to_order('INPLACE', order_data[2])

@@ -19,9 +19,9 @@ class CountDownList:
     def get_element_from_count_down_list(self, id_by_element):
         try:
             for element_from_count_down in self.__count_down_list:
-                if element_from_count_down == id_by_element:
-                    return self.__count_down_list[id_by_element]
-        finally:
+                if element_from_count_down.id == id_by_element:
+                    return element_from_count_down
+        except:
             print("Exception from 'get_element_from_count_down'")
 
 

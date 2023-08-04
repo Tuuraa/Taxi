@@ -245,7 +245,7 @@ async def update_total_amount_by_order(order_id, add_amount):
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            "update orders set amount = amount + %s where id = order_id = %s",
+            "update orders set amount = amount + %s where id = %s",
             add_amount, order_id
         )
 

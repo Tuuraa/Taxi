@@ -203,7 +203,7 @@ async def check_wrong_status_to_cancel(user_id):
     async with connection.cursor() as cursor:
         await cursor.execute(
             "select * from orders where user_id = %s and status = 'WAITING' "
-            "or status = 'IN_PLACE' or status = 'PROCESSING'", user_id)
+            "or status = 'INPLACE' or status = 'PROCESSING'", user_id)
 
         result = await cursor.fetchall()
         return bool(result)
@@ -226,8 +226,8 @@ async def get_last_id_from_orders():
 
     async with connection.cursor() as cursor:
         await cursor.execute(
-            "select * from orders where id=LAST_INSERT_ID()"
+            "select * from orders order by id desc limit 1"
         )
 
         result = await cursor.fetchone()
-        return int(result[0]) + 1
+        return int(result[0])
