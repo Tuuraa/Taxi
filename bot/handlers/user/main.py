@@ -651,7 +651,7 @@ async def in_place(callback: CallbackQuery):
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
-        new_cd = Countdown(user_data[4], order_data_by_db[0], callback.from_user.id, int(order_data[1]), loop, step=2)
+        new_cd = Countdown(user_data[4], order_data_by_db[0], callback.from_user.id, int(order_data[1]), loop)
         count_down_list.add_count_down(new_cd)
 
         await db_update.change_status_to_order('INPLACE', order_data[2])
