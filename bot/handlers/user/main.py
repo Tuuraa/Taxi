@@ -351,9 +351,15 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
              proxy['is_baggage']
          )
 
+        distance = int(proxy['distance'])
+        amount = int(proxy['amount'])
+
         await bot.send_message(
             callback.from_user.id,
-            'Заказ успешно создан.',
+            'Заказ успешно создан.'
+            f'Расстояние составляет: {round(distance * 1, 56)} км.\n'
+            f'Время пути составит: {round(distance / 50)} ч.\n'
+            f'Сумма к оплате: {amount} руб.\n',
             reply_markup=reply.profile_passenger_markup()
         )
 
@@ -370,74 +376,6 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
         await send_order_to_all_drivers(proxy['republic'], proxy['amount'])
 
         await state.reset_state(with_data=True)
-
-
-async def del_pay_by_cash(callback: CallbackQuery, state: FSMContext):
-
-    await bot.delete_message(
-        callback.from_user.id,
-        callback.message.message_id
-    )
-
-    async with state.proxy() as proxy:
-        proxy['delivery_type_pay'] = 'cash'
-
-        await db_create.create_delivery(
-            callback.from_user.id,
-            proxy['current_delivery_location'][0],
-            proxy['delivery_order_location'][0],
-            proxy['delivery_distance'],
-            proxy['delivery_amount'],
-            proxy['republic'],
-            datetime.now(),
-            'cash'
-        )
-
-        await bot.send_message(
-            callback.from_user.id,
-            'Заказ успешно создан',
-            reply_markup=reply.profile_passenger_markup()
-        )
-        await state.reset_state(with_data=True)
-
-
-async def del_pay_by_wallet(callback: CallbackQuery, state: FSMContext):
-    await bot.delete_message(
-        callback.from_user.id,
-        callback.message.message_id
-    )
-
-    async with lock:
-        async with state.proxy() as proxy:
-            user_balance = await db_select.balance_by_user(callback.from_user.id)
-
-            if user_balance < int(proxy['delivery_amount']):
-                await bot.send_message(
-                    callback.from_user.id,
-                    'Недостаточно средств для заказа такси. Необходимо пополнить баланс, либо выбрать другой тип оплаты',
-                    reply_markup=inline.not_enough_amount()
-                )
-                return
-
-            await db_create.create_delivery(
-                proxy["current_location"][0],
-                proxy["order_location"][0],
-                proxy['distance'],
-                proxy['amount'],
-                proxy['republic'],
-                datetime.now(),
-                'wallet',
-                proxy['time'],
-
-            )
-
-            await bot.send_message(
-                callback.from_user.id,
-                'Заказ успешно создан.',
-                reply_markup=reply.profile_passenger_markup()
-            )
-
-            await state.reset_state(with_data=True)
 
 
 async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
@@ -474,9 +412,15 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
                 proxy['is_baggage']
             )
 
+            distance = int(proxy['distance'])
+            amount = int(proxy['amount'])
+
             await bot.send_message(
                 callback.from_user.id,
-                'Заказ успешно создан.',
+                'Заказ успешно создан.'
+                f'Расстояние составляет: {round(distance * 1,56)} км.\n'
+                f'Время пути составит: {round(distance / 50)} ч.\n'
+                f'Сумма к оплате: {amount} руб.\n',
                 reply_markup=reply.profile_passenger_markup()
             )
 
@@ -505,27 +449,39 @@ async def cancel_order(callback: CallbackQuery):
 
     order_data = callback.data.split(':')
 
-    await db_update.remove_balance_from_user(100, callback.from_user.id)
-    await db_update.change_status_to_order('CANCELED', order_data[2])
+    status_order = await db_select.get_status_from_order(order_data[2])
 
-    await bot.send_message(
-        callback.from_user.id,
-        f'Вы успешно отменили заказ. С вашего счета было списано 100 руб.  \n'
-        f'Обращаем внимание что вы не сможете заказывать такси если у вас будет отрицательный баланс в боте\n',
-        reply_markup=reply.profile_passenger_markup(),
-        parse_mode='html'
-    )
+    if status_order == 'WAITING':
+        await db_update.change_status_to_order('CANCELED', order_data[2])
 
-    try:
         await bot.send_message(
-            int(order_data[3]),
-            f'Ваш заказ был отменен пассажиром  @{callback.from_user.username}\n\n'
-            f'В случае ошибки обратитесь в тех поддержку',
-            reply_markup=reply.profile_driver_markup(),
+            callback.from_user.id,
+            f'Вы успешно отменили заказ.',
+            reply_markup=reply.profile_passenger_markup(),
             parse_mode='html'
         )
-    except:
-        pass
+    else:
+        await db_update.remove_balance_from_user(100, callback.from_user.id)
+        await db_update.change_status_to_order('CANCELED', order_data[2])
+
+        await bot.send_message(
+            callback.from_user.id,
+            f'Вы успешно отменили заказ. С вашего счета было списано 100 руб.  \n'
+            f'Обращаем внимание что вы не сможете заказывать такси если у вас будет отрицательный баланс в боте\n',
+            reply_markup=reply.profile_passenger_markup(),
+            parse_mode='html'
+        )
+
+        try:
+            await bot.send_message(
+                int(order_data[3]),
+                f'Ваш заказ был отменен пассажиром  @{callback.from_user.username}\n\n'
+                f'В случае ошибки обратитесь в тех поддержку',
+                reply_markup=reply.profile_driver_markup(),
+                parse_mode='html'
+            )
+        except:
+            pass
 
 
 async def change_order(message: Message, state: FSMContext):
