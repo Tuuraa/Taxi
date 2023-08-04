@@ -356,9 +356,9 @@ async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
 
         await bot.send_message(
             callback.from_user.id,
-            'Заказ успешно создан.'
+            'Заказ успешно создан.\n'
             f'Расстояние составляет: {round(distance * 1, 56)} км.\n'
-            f'Время пути составит: {round(distance / 50)} ч.\n'
+            f'Время пути составит: {distance / 50} ч.\n'
             f'Сумма к оплате: {amount} руб.\n',
             reply_markup=reply.profile_passenger_markup()
         )
@@ -417,9 +417,9 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
 
             await bot.send_message(
                 callback.from_user.id,
-                'Заказ успешно создан.'
+                'Заказ успешно создан.\n'
                 f'Расстояние составляет: {round(distance * 1,56)} км.\n'
-                f'Время пути составит: {round(distance / 50)} ч.\n'
+                f'Время пути составит: {distance / 50} ч.\n'
                 f'Сумма к оплате: {amount} руб.\n',
                 reply_markup=reply.profile_passenger_markup()
             )
@@ -843,10 +843,6 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(order_location, state=UserLocationFSM.order_location,
                                 content_types=['location', 'text'])
 
-    dp.register_callback_query_handler(del_pay_by_cash, text='del_pay_by_cash',
-                                       state=DeliveryFSM.delivery_type_pay)
-    dp.register_callback_query_handler(del_pay_by_wallet, text='del_pay_by_wallet',
-                                       state=DeliveryFSM.delivery_type_pay)
     dp.register_callback_query_handler(pay_by_cash, text='pay_by_cash', state=UserLocationFSM.type_pay)
     dp.register_callback_query_handler(pay_by_wallet, text='pay_by_wallet', state=UserLocationFSM.type_pay)
 
