@@ -66,7 +66,7 @@ def responde_order(order):
     )
 
 
-def apply_order(user_id, order_id, driver_id):
+def apply_order(user_id, order_id, driver_id, route_url):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
             'Подтвердить выполнение заказа',
@@ -77,7 +77,11 @@ def apply_order(user_id, order_id, driver_id):
                 data='apply_order'
             )
         )
-    )
+    ).add(
+        InlineKeyboardButton(
+            "Построить маршрут",
+            web_app=WebAppInfo(url=route_url)
+        ))
 
 
 def change_user(user_id):
@@ -185,14 +189,5 @@ def cancel_order(user_id, order_id, driver_id):
                 driver_id=driver_id,
                 data='cancel_order'
             )
-        )
-    )
-
-
-def build_route(route_url):
-    return InlineKeyboardMarkup().add(
-        InlineKeyboardButton(
-            "Построить маршрут",
-            web_app=WebAppInfo(url=route_url)
         )
     )

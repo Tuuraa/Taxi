@@ -731,7 +731,12 @@ async def start_travel(callback: CallbackQuery):
         response_loc = decode_location(address)
         location = [(loc.latitude, loc.longitude) for loc in response_loc]
 
-        print(location)
+        route_url = f'https://yandex.ru/maps/1104/cherkessk/?ll=42.045553%2C44.227328&mode=routes&' \
+                    f'rtext={location[0][0]}%2C{location[0][1]}~{location[1][0]}%2C{location[1][1]}&rtt=auto&ruri=~' \
+                    f'ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgoxNTAxOTA1NTg2En_QoNC-0YHRgdC40Y8sINCa0LDRgNCw0YfQs' \
+                    f'NC10LLQvi3Qp9C10YDQutC10YHRgdC60LDRj' \
+                    f'yDQoNC10YHQv9GD0LHQu9C40LrQsCwg0KfQtdGA0LrQtdGB0YHQuiwg0L_RgNC-0YHQv9C10LrRgiDQm9C10L3QuNC90LA' \
+                    f'sIDczIgoNAS8oQhUI4DBC&z=15.92'
 
         await bot.send_message(
             callback.from_user.id,
@@ -742,7 +747,7 @@ async def start_travel(callback: CallbackQuery):
             f'Телефон пассажира: <b>{user_data[3]}</b>\n'
             f'Ссылка: @{user_data[4]}\n\n'
             f'<b>после нажатие на кнопку вы подтвердите что приступили к поездке</b>',
-            reply_markup=inline.apply_order(user_data[1], order_user_data[1], order_data_by_db[0]),
+            reply_markup=inline.apply_order(user_data[1], order_user_data[1], order_data_by_db[0], route_url),
             parse_mode='html'
         )
 
