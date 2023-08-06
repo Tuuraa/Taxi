@@ -5,10 +5,14 @@ bot = Bot(token='6188206507:AAH1du89pRXK3Hw3KXnlvDOYeU75X96tx5U')
 
 payment_token = '1902332405:LIVE:638151872098154178'
 
+yan_maps_url = 'https://yandex.ru/maps/1104/cherkessk/?ll=42.045553%2C44.227328&mode=routes&rtext=44.232949%2C42.051897~44.218781%2C42.045907&rtt=auto&ruri=~ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgoxNTAxOTA1NTg2En_QoNC-0YHRgdC40Y8sINCa0LDRgNCw0YfQsNC10LLQvi3Qp9C10YDQutC10YHRgdC60LDRjyDQoNC10YHQv9GD0LHQu9C40LrQsCwg0KfQtdGA0LrQtdGB0YHQuiwg0L_RgNC-0YHQv9C10LrRgiDQm9C10L3QuNC90LAsIDczIgoNAS8oQhUI4DBC&z=15.92'
+
 republics = [
     'Ингушетия', 'Северная Осетия — Алания', 'Дагестан', 'Чечня', 'Кабардино-Балкария',
     'Карачаево-Черкесия', 'Карачаево-Черкесская Республика', 'Ставропольский край'
 ]
+
+
 
 admins = [855151774, 326460830, 982616847]
 
