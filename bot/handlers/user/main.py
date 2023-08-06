@@ -728,7 +728,9 @@ async def start_travel(callback: CallbackQuery):
 
         address = await db_select.get_geocode_location(order_data[2])
 
-        location = decode_location(address)
+        response_loc = decode_location(address)
+        location = [(loc.latitude, loc.longitude) for loc in response_loc]
+
         print(location)
 
         await bot.send_message(
