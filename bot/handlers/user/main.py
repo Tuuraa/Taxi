@@ -726,6 +726,11 @@ async def start_travel(callback: CallbackQuery):
             parse_mode='html'
         )
 
+        address = await db_select.get_geocode_location(order_data[2])
+
+        location = decode_location(address)
+        print(location)
+
         await bot.send_message(
             callback.from_user.id,
             'Данные о заказе:\n\n'
@@ -775,7 +780,7 @@ async def apply_order(callback: CallbackQuery):
 
         await bot.send_message(
             callback.from_user.id,
-            f'Заказ №{order_data[1]} успешно подтвержден.С вашего баланса был снята коммисия в размере пяти процентов'
+            f'Заказ №{order_data[1]} успешно подтвержден. С вашего баланса был снята коммисия в размере пяти процентов'
             f'от цена заказа {commision}'
         )
 
