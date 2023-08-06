@@ -449,7 +449,7 @@ async def cancel_order(callback: CallbackQuery):
 
     order_data = callback.data.split(':')
 
-    status_order = await db_select.get_status_from_order(order_data[2])
+    status_order = (await db_select.get_status_from_order(order_data[2]))[0]
 
     if status_order == 'WAITING':
         await db_update.change_status_to_order('CANCELED', order_data[2])
