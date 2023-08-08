@@ -174,7 +174,6 @@ async def start_travel(callback: CallbackQuery):
 
         route_url = yan_maps_url.format(location[0][0], location[0][1], location[1][0], location[1][1])
 
-        print(route_url)
         await bot.send_message(
             callback.from_user.id,
             'Данные о заказе:\n\n'
