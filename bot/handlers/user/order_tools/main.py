@@ -2,7 +2,7 @@ from datetime import datetime
 from asyncio import Lock, get_event_loop
 
 from aiogram import Dispatcher
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery
 
 from bot.handlers.user.count_down import *
 from bot.handlers.utils import *
