@@ -120,7 +120,7 @@ async def data_of_driver(message: Message, state: FSMContext):
             f'📱 Телефон: <b>{driver_data[5]}</b>\n\n'
             f'🚗 Марка машины: <b>{driver_data[3]}</b>\n'
             f'🚕 Номер машины: <b>{driver_data[4]}</b>\n'
-            f'⛰️ Республика: <b>{driver_data[8]}</b>\n'
+            f'⛰ Республика: <b>{driver_data[8]}</b>\n'
             f'💵 Баланс: <b>{driver_data[9]}</b> руб\n',
             parse_mode='html',
             reply_markup=inline.change_user(message.text)
