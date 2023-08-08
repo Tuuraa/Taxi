@@ -451,6 +451,14 @@ async def cancel_order(callback: CallbackQuery):
 
     status_order = (await db_select.get_status_from_order(order_data[2]))[0]
 
+    if status_order == 'START_TRAVEL':
+
+        await bot.send_message(
+            callback.from_user.id,
+            f'Вы не можете отменить заказ т.к. водитель начал его исполнение.',
+        )
+        return
+
     if status_order == 'WAITING':
         await db_update.change_status_to_order('CANCELED', order_data[2])
 
@@ -458,7 +466,6 @@ async def cancel_order(callback: CallbackQuery):
             callback.from_user.id,
             f'Вы успешно отменили заказ.',
             reply_markup=reply.profile_passenger_markup(),
-            parse_mode='html'
         )
     else:
         await db_update.remove_balance_from_user(100, callback.from_user.id)
@@ -731,14 +738,8 @@ async def start_travel(callback: CallbackQuery):
         response_loc = decode_location(address)
         location = [(loc.latitude, loc.longitude) for loc in response_loc]
 
-        route_url = f'https://yandex.ru/maps/?rtext={location[0][0]},{location[0][1]}~{location[1][0]},{location[1][1]}&rtt=auto'
+        route_url = yan_maps_url.format(location[0][0], location[0][1], location[1][0], location[1][1])
 
-        # route_url = f'https://yandex.ru/maps/?ll={location[0][1]}%2C{location[0][0]}&mode=routes&' \
-        #             f'rtext={location[0][0]}%2C{location[0][1]}~{location[1][0]}%2C{location[1][1]}&rtt=auto&ruri=' \
-        #             f'ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgoxNTAxOTA1NTg2En_QoNC-0YHRgdC40Y8sINCa0LDRgNCw0YfQs' \
-        #             f'NC10LLQvi3Qp9C10YDQutC10YHRgdC60LDRj' \
-        #             f'yDQoNC10YHQv9GD0LHQu9C40LrQsCwg0KfQtdGA0LrQtdGB0YHQuiwg0L_RgNC-0YHQv9C10LrRgiDQm9C10L3QuNC90LA' \
-        #             f'sIDczIgoNAS8oQhUI4DBC&z=15.92'
         print(route_url)
         await bot.send_message(
             callback.from_user.id,
