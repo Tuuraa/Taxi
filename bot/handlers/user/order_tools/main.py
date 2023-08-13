@@ -106,7 +106,8 @@ async def in_place(callback: CallbackQuery):
         await bot.send_message(
             int(order_data[1]),
             f'Ваш водитель @{callback.from_user.username} подтвердил что он находится на месте.\n'
-            f'Время бесплатного ожидания 5 минут.Дальше цена будет расти как  7 рублей за минуту\n\n'
+            f'Время бесплатного ожидания 5 минут. \n'
+            f'Дальше цена будет расти 7 рублей за минуту\n\n'
             f'Данные о нем:\n'
             f'Телефон: <b>{order_user_data[5]}</b>\n'
             f'Марка машины: <b>{order_user_data[3]}</b>\n'

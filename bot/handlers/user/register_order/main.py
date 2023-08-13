@@ -185,79 +185,6 @@ async def order_location(message: Message, state: FSMContext):
         )
 
 
-async def current_delivery_location(message: Message, state: FSMContext):
-    location = current_user_location(message)
-
-    async with state.proxy() as proxy:
-        proxy['current_delivery_location'] = location[0], location[1], location[2]
-
-    await message.answer(
-        "А теперь куда хотите заказать доставку.\n"
-        "Для этого нажмите на скрепку 📎, и оправьте локацию, куда хотите поехать\n\n"
-        "<b><i>Обратите внимание, адрес должен быть точно указан.</i></b>",
-        reply_markup=reply.order_location()
-    )
-
-    await DeliveryFSM.next()
-
-
-async def delivery_order_location(message: Message, state: FSMContext):
-    location = current_user_location(message)
-
-    async with state.proxy() as proxy:
-        proxy['delivery_order_location'] = location[0], location[1], location[2]
-
-        location_list = proxy['current_delivery_location'][0].address.split(', ')
-        republic = ''
-        user_data = await db_select.type_user(message.from_user.id)
-
-        for loc in location_list:
-            if loc in republics:
-                republic = loc
-                break
-
-        if not republic:
-            await message.answer(
-                'В данном регионе этот сервис не работает!!',
-                reply_markup=reply.profile_passenger_markup() if user_data == 'passenger' else reply.profile_driver_markup()
-            )
-            await state.reset_state(with_data=True)
-            return
-
-        await message.answer(
-            f'Откуда:\n{proxy["current_delivery_location"][0]}'
-        )
-
-        await message.answer(
-            f'Куда:\n{location[0]}'
-        )
-
-        first_loc = proxy['current_delivery_location'][1], proxy['current_delivery_location'][2]
-        second_loc = proxy['delivery_order_location'][1], proxy['delivery_order_location'][2]
-
-        distance = round(distance_btw_two_points(
-            current_point=first_loc,
-            order_point=second_loc
-        ).km, 3)
-
-        amount = 75 + 10 * (distance - 1) + 5 * (1 + distance / 50 - 5)
-
-        proxy['delivery_distance'] = distance
-        proxy['delivery_time'] = round(distance / 50, 2)
-        proxy['delivery_amount'] = amount
-        proxy['republic'] = republic
-
-        await message.answer(
-            f'Расстояние составляет: {round(distance * 1,56)} км.\n'
-            f'Время пути составит: {round(distance / 50)} ч.\n'
-            f'Сумма к оплате: {amount} руб.\n'
-            f'Выберите каким образом будете оплачивать',
-            reply_markup=inline.pay_delivery()
-        )
-
-        await DeliveryFSM.delivery_type_pay.set()
-
-
 async def pay_by_cash(callback: CallbackQuery, state: FSMContext):
 
     await bot.delete_message(
@@ -372,10 +299,6 @@ async def pay_by_wallet(callback: CallbackQuery, state: FSMContext):
 
 def register_create_order_handlers(dp: Dispatcher):
     dp.register_message_handler(current_user_location_handler, state=UserLocationFSM.current_location,
-                                content_types=['location', 'text'])
-    dp.register_message_handler(current_delivery_location, state=DeliveryFSM.current_delivery_location,
-                                content_types=['location', 'text'])
-    dp.register_message_handler(delivery_order_location, state=DeliveryFSM.delivery_order_location,
                                 content_types=['location', 'text'])
     dp.register_message_handler(order_location, state=UserLocationFSM.order_location,
                                 content_types=['location', 'text'])
