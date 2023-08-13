@@ -203,7 +203,7 @@ async def check_wrong_status_to_cancel(user_id):
     async with connection.cursor() as cursor:
         await cursor.execute(
             "select * from orders where user_id = %s and status = 'WAITING' "
-            "or status = 'INPLACE' or status = 'PROCESSING'", user_id)
+            "or status = 'INPLACE' or status = 'PROCESSING' or status = 'START_TRAVEL'", user_id)
 
         result = await cursor.fetchall()
         return bool(result)
@@ -231,6 +231,19 @@ async def get_last_id_from_orders():
 
         result = await cursor.fetchone()
         return int(result[0])
+
+
+async def get_point_loc(order_id):
+    connection, cursor = await async_connect_to_my_sql()
+
+    async with connection.cursor() as cursor:
+        await cursor.execute(
+            'select user_location from orders where id = %s',
+            order_id
+        )
+
+        result = await cursor.fetchone()
+        return result
 
 
 async def get_geocode_location(order_id):

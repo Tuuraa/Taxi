@@ -45,6 +45,12 @@ def current_user_location(location: Message):
         return location, location.latitude, location.longitude
 
 
+def decode_point(address_point):
+    location = nomin.geocode(address_point[0])
+
+    return location
+
+
 def decode_location(address):
     location = nomin.geocode(address[0]), nomin.geocode(address[1])
 

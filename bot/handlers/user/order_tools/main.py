@@ -35,7 +35,7 @@ async def response(callback: CallbackQuery):
         order_data_by_db = await db_select.information_by_order(int(order_data[2]))
         order_user_data = await db_select.information_by_driver(callback.from_user.id)
 
-        await db_update.change_status_to_order('PROCESSING', order_data[2])
+        #await db_update.change_status_to_order('PROCESSING', order_data[2])
         await db_update.change_driver_id_to_order(order_user_data[1], order_data_by_db[0])
 
         await bot.send_message(
@@ -52,6 +52,12 @@ async def response(callback: CallbackQuery):
             ),
             parse_mode='html'
         )
+        address_point = await db_select.get_point_loc(order_data[2])
+
+        response_loc = decode_point(address_point)
+        loc_latitude, loc_longitude = response_loc.latitude, response_loc.longitude
+
+        route_point_url = yan_maps_point_url.format(loc_latitude, loc_longitude)
 
         await bot.send_message(
             callback.from_user.id,
@@ -63,7 +69,7 @@ async def response(callback: CallbackQuery):
             f'Ссылка: @{user_data[4]}\n\n'
             f'<b>После нажатия на кнопку вы подтвердите что находитесь на месте. <i>Не нажимайте кнопку, если вы еще '
             f'не на месте, в случай ошибки обратитесь в тех. поддержку</i></b>',
-            reply_markup=inline.in_place(user_data[1], order_user_data[1], order_data_by_db[0]),
+            reply_markup=inline.in_place(user_data[1], order_user_data[1], order_data_by_db[0], route_point_url),
             parse_mode='html'
         )
 
@@ -172,7 +178,7 @@ async def start_travel(callback: CallbackQuery):
         response_loc = decode_location(address)
         location = [(loc.latitude, loc.longitude) for loc in response_loc]
 
-        route_url = yan_maps_url.format(location[0][0], location[0][1], location[1][0], location[1][1])
+        route_url = yan_maps_navigate_url.format(location[0][0], location[0][1], location[1][0], location[1][1])
 
         await bot.send_message(
             callback.from_user.id,
