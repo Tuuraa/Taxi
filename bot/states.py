@@ -31,16 +31,6 @@ class UserLocationFSM(StatesGroup):
     driver_id = State()
 
 
-class DeliveryFSM(StatesGroup):
-    current_delivery_location = State()
-    delivery_order_location = State()
-    delivery_time = State()
-    delivery_amount = State()
-    delivery_distance = State()
-    republic = State()
-    delivery_type_pay = State()
-
-
 class CreateRequestWithdrowFSM(StatesGroup):
     type_bank = State()
     card = State()

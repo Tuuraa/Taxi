@@ -40,7 +40,7 @@ def profile_passenger_btn():
 def profile_driver_btn():
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton('💰 Вывести', callback_data='withdraw'),
-        InlineKeyboardButton("Сменить республику", callback_data="change_region")
+        InlineKeyboardButton("⛰ Сменить республику", callback_data="change_region")
     )
 
 
@@ -69,7 +69,7 @@ def responde_order(order):
 def apply_order(user_id, order_id, driver_id, route_url):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
-            'Подтвердить выполнение заказа',
+            '✅ Подтвердить выполнение заказа',
             callback_data=cb_apply.new(
                 user_id=user_id,
                 order_id=order_id,
@@ -79,7 +79,7 @@ def apply_order(user_id, order_id, driver_id, route_url):
         )
     ).add(
         InlineKeyboardButton(
-            "Построить маршрут",
+            "🚐 Построить маршрут",
             web_app=WebAppInfo(url=route_url)
         ))
 
@@ -98,9 +98,9 @@ def change_user(user_id):
 
 def pay_order():
     return InlineKeyboardMarkup().add(
-        InlineKeyboardButton('Заплатить наличными', callback_data='pay_by_cash')
+        InlineKeyboardButton('💵 Заплатить наличными', callback_data='pay_by_cash')
     ).add(
-        InlineKeyboardButton('Снять с баланса бота', callback_data='pay_by_wallet')
+        InlineKeyboardButton('🤖 Снять с баланса бота', callback_data='pay_by_wallet')
     )
 
 
@@ -154,7 +154,7 @@ def withdraw_items(id_withdraw):
 def in_place(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
-            'Подтвердить что вы на месте',
+            '📍 Подтвердить что вы на месте',
             callback_data=cb_arrival.new(
                 user_id=user_id,
                 order_id=order_id,
@@ -168,7 +168,7 @@ def in_place(user_id, order_id, driver_id):
 def start_travel(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
-            'Подтвердить начало поедзки',
+            '✅ Подтвердить начало поедзки',
             callback_data=cb_start.new(
                 user_id=user_id,
                 order_id=order_id,
@@ -182,7 +182,7 @@ def start_travel(user_id, order_id, driver_id):
 def cancel_order(user_id, order_id, driver_id):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
-            'Отменить заказ',
+            '❌ Отменить заказ',
             callback_data=cb_cancel.new(
                 user_id=user_id,
                 order_id=order_id,

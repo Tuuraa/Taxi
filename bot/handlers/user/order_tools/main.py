@@ -173,7 +173,7 @@ async def start_travel(callback: CallbackQuery):
         response_loc = decode_location(address)
         location = [(loc.latitude, loc.longitude) for loc in response_loc]
 
-        route_url = yan_maps_url.format(location[0][0], location[0][1], location[1][0], location[1][1])
+        route_url = yan_maps_navigate_url.format(location[0][0], location[0][1], location[1][0], location[1][1])
 
         await bot.send_message(
             callback.from_user.id,

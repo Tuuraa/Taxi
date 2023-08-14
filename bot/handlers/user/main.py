@@ -105,7 +105,7 @@ async def order_delivery(message: Message, state: FSMContext):
     await state.reset_state(with_data=True)
 
     await message.answer(
-        'Отправьте локацию, либо пропишите ее вручную',
+        'Отправьте локацию, либо пропишите ее вручную.',
         reply_markup=reply.set_current_locale()
     )
 

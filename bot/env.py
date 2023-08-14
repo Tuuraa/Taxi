@@ -1,18 +1,19 @@
 from aiogram import Bot
 
 
+DEBUG = True
+DB_PASSWORD = ''
+
 bot = Bot(token='6188206507:AAH1du89pRXK3Hw3KXnlvDOYeU75X96tx5U')
 
 payment_token = '1902332405:LIVE:638151872098154178'
 
-yan_maps_url = 'https://yandex.ru/maps/?rtext={0},{1}~{2},{3}&rtt=auto'
+yan_maps_navigate_url = 'https://yandex.ru/maps/?rtext={0},{1}~{2},{3}&rtt=auto'
 
 republics = [
     'Ингушетия', 'Северная Осетия — Алания', 'Дагестан', 'Чечня', 'Кабардино-Балкария',
     'Карачаево-Черкесская Республика', 'Ставропольский край'
 ]
-
-
 
 admins = [855151774, 326460830, 982616847]
 
