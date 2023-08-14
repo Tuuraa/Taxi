@@ -1,6 +1,9 @@
 from aiogram import Bot
 
 
+DEBUG = True
+DB_PASSWORD = ''
+
 bot = Bot(token='6188206507:AAH1du89pRXK3Hw3KXnlvDOYeU75X96tx5U')
 
 payment_token = '1902332405:LIVE:638151872098154178'
