@@ -151,7 +151,7 @@ def withdraw_items(id_withdraw):
     )
 
 
-def in_place(user_id, order_id, driver_id):
+def in_place(user_id, order_id, driver_id, route_point_url):
     return InlineKeyboardMarkup().add(
         InlineKeyboardButton(
             '📍 Подтвердить что вы на месте',
@@ -162,7 +162,11 @@ def in_place(user_id, order_id, driver_id):
                 data='in_place'
             )
         )
-    )
+    ).add(
+        InlineKeyboardButton(
+            "Построить маршрут до пассажира",
+            web_app=WebAppInfo(url=route_point_url)
+        ))
 
 
 def start_travel(user_id, order_id, driver_id):
