@@ -4,9 +4,11 @@ from aiogram import Bot
 DEBUG = True
 DB_PASSWORD = ''
 
-bot = Bot(token='6188206507:AAH1du89pRXK3Hw3KXnlvDOYeU75X96tx5U')
+# get from .env
+bot = Bot(token='')
 
-payment_token = '1902332405:LIVE:638151872098154178'
+# get from .env
+payment_token = ''
 
 yan_maps_navigate_url = 'https://yandex.ru/maps/?rtext={0},{1}~{2},{3}&rtt=auto'
 yan_maps_point_url = 'https://maps.yandex.ru//?pt={1},{0}&z=18&l=map'
